@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,6 +62,13 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				// GreenSpace custom colors
+				greenspace: {
+					'primary': '#2E7D32',   // Vert forêt
+					'light': '#66BB6A',     // Vert clair
+					'accent': '#81D4FA',    // Bleu clair
+					'neutral': '#F5F5F5',   // Gris clair
 				}
 			},
 			borderRadius: {
@@ -84,11 +92,20 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'float': {
+					'0%, 100%': { transform: 'translateY(0)' },
+					'50%': { transform: 'translateY(-10px)' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'float': 'float 6s ease-in-out infinite'
+			},
+			backgroundImage: {
+				'green-gradient': 'linear-gradient(to right, #66BB6A, #2E7D32)',
+				'blue-gradient': 'linear-gradient(to right, #81D4FA, #4FC3F7)',
 			}
 		}
 	},
