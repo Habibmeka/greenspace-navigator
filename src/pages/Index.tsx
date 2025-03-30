@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -187,46 +186,51 @@ const Index = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-greenspace-primary text-white py-8">
+      <footer className="bg-white text-gray-700 py-10 border-t border-gray-200">
         <div className="section-container">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
-              <h3 className="text-lg font-semibold mb-4 text-white">GreenSpace</h3>
-              <div className="flex items-center">
-                <Leaf className="h-6 w-6 mr-2" />
-                <span className="font-bold">GreenSpace</span>
+              <div className="flex items-center mb-4">
+                <Leaf className="h-6 w-6 text-greenspace-primary mr-2" />
+                <span className="font-bold text-xl text-greenspace-primary">GreenSpace</span>
               </div>
-              <p className="mt-2 text-sm text-white/80">
-                Votre guide des espaces verts à Paris.
+              <p className="text-sm text-gray-600 mb-4">
+                La solution pour une exploration plus verte et plus intelligente à Paris.
               </p>
             </div>
+            
             <div>
-              <h3 className="text-lg font-semibold mb-4 text-white">Navigation</h3>
+              <h3 className="text-lg font-semibold mb-4">PRODUIT</h3>
               <ul className="space-y-2 text-sm">
-                <li><Link to="/" className="hover:underline">Accueil</Link></li>
-                <li><Link to="/map" className="hover:underline">Carte</Link></li>
-                <li><Link to="/air-quality" className="hover:underline">Qualité de l'air</Link></li>
-                <li><Link to="/biodiversity" className="hover:underline">Biodiversité</Link></li>
-                <li><Link to="/eco-tips" className="hover:underline">Écogestes</Link></li>
+                <li><Link to="/map" className="hover:text-greenspace-primary">Carte</Link></li>
+                <li><Link to="/air-quality" className="hover:text-greenspace-primary">Qualité de l'air</Link></li>
+                <li><Link to="/biodiversity" className="hover:text-greenspace-primary">Biodiversité</Link></li>
+                <li><Link to="/eco-tips" className="hover:text-greenspace-primary">Écogestes</Link></li>
               </ul>
             </div>
+            
             <div>
-              <h3 className="text-lg font-semibold mb-4 text-white">Compte</h3>
+              <h3 className="text-lg font-semibold mb-4">ENTREPRISE</h3>
               <ul className="space-y-2 text-sm">
-                <li><Link to="/sign-in" className="hover:underline">Connexion</Link></li>
-                <li><Link to="/sign-up" className="hover:underline">Inscription</Link></li>
+                <li><a href="#" className="hover:text-greenspace-primary">À propos</a></li>
+                <li><a href="#" className="hover:text-greenspace-primary">Blog</a></li>
+                <li><a href="#" className="hover:text-greenspace-primary">Carrières</a></li>
+                <li><a href="#" className="hover:text-greenspace-primary">Contact</a></li>
               </ul>
             </div>
+            
             <div>
-              <h3 className="text-lg font-semibold mb-4 text-white">Légal</h3>
+              <h3 className="text-lg font-semibold mb-4">LÉGAL</h3>
               <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:underline">Conditions d'utilisation</a></li>
-                <li><a href="#" className="hover:underline">Politique de confidentialité</a></li>
-                <li><a href="#" className="hover:underline">Mentions légales</a></li>
+                <li><a href="#" className="hover:text-greenspace-primary">Conditions d'utilisation</a></li>
+                <li><a href="#" className="hover:text-greenspace-primary">Politique de confidentialité</a></li>
+                <li><a href="#" className="hover:text-greenspace-primary">Mentions légales</a></li>
+                <li><a href="#" className="hover:text-greenspace-primary">Notre Histoire</a></li>
               </ul>
             </div>
           </div>
-          <div className="mt-8 pt-8 border-t border-white/20 text-center text-sm text-white/70">
+          
+          <div className="mt-8 pt-8 border-t border-gray-200 text-center text-sm text-gray-500">
             <p>© {new Date().getFullYear()} GreenSpace. Tous droits réservés.</p>
           </div>
         </div>
