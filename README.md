@@ -2,7 +2,7 @@
 
 Ceci est un projet dans le cadre du projet open innovation
 
-comment utiliser et insaller ce projet en local.
+comment utiliser et insaller ce projet en local
 
 ```sh
 # Step 1: Clone the repository using the project's Git URL.
