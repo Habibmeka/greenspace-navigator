@@ -7,32 +7,25 @@ import Navbar from '@/components/Navbar';
 import AirQualityCard from '@/components/AirQualityCard';
 import EcoTipsCard from '@/components/EcoTipsCard';
 import MapPreview from '@/components/MapPreview';
-
 const Index = () => {
   // Données simulées pour les écogestes
-  const ecoTips = [
-    {
-      title: "Économiser l'eau",
-      description: "Fermez le robinet pendant le brossage des dents et privilégiez les douches courtes.",
-      icon: <CloudSun className="h-6 w-6" />,
-      moreLink: "/eco-tips#water"
-    },
-    {
-      title: "Composter",
-      description: "Transformez vos déchets organiques en ressource pour vos plantes.",
-      icon: <Leaf className="h-6 w-6" />,
-      moreLink: "/eco-tips#compost"
-    },
-    {
-      title: "Planter local",
-      description: "Choisissez des espèces adaptées au climat parisien pour votre balcon ou jardin.",
-      icon: <TreeDeciduous className="h-6 w-6" />,
-      moreLink: "/eco-tips#plants"
-    }
-  ];
-
-  return (
-    <div className="min-h-screen flex flex-col">
+  const ecoTips = [{
+    title: "Économiser l'eau",
+    description: "Fermez le robinet pendant le brossage des dents et privilégiez les douches courtes.",
+    icon: <CloudSun className="h-6 w-6" />,
+    moreLink: "/eco-tips#water"
+  }, {
+    title: "Composter",
+    description: "Transformez vos déchets organiques en ressource pour vos plantes.",
+    icon: <Leaf className="h-6 w-6" />,
+    moreLink: "/eco-tips#compost"
+  }, {
+    title: "Planter local",
+    description: "Choisissez des espèces adaptées au climat parisien pour votre balcon ou jardin.",
+    icon: <TreeDeciduous className="h-6 w-6" />,
+    moreLink: "/eco-tips#plants"
+  }];
+  return <div className="min-h-screen flex flex-col">
       <Navbar />
       
       {/* Hero Section */}
@@ -55,7 +48,7 @@ const Index = () => {
                   </Button>
                 </Link>
                 <Link to="/biodiversity">
-                  <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/20">
+                  <Button size="lg" variant="outline" className="border-white hover:bg-white/20 text-gray-900">
                     <TreeDeciduous className="mr-2 h-5 w-5" />
                     Découvrir la biodiversité
                   </Button>
@@ -63,11 +56,7 @@ const Index = () => {
               </div>
             </div>
             <div className="hidden lg:block">
-              <img 
-                src="https://images.unsplash.com/photo-1518495973542-4542c06a5843?auto=format&fit=crop&w=800&h=600&q=80" 
-                alt="Parc à Paris" 
-                className="rounded-lg shadow-lg max-w-full"
-              />
+              <img src="https://images.unsplash.com/photo-1518495973542-4542c06a5843?auto=format&fit=crop&w=800&h=600&q=80" alt="Parc à Paris" className="rounded-lg shadow-lg max-w-full" />
             </div>
           </div>
         </div>
@@ -92,12 +81,7 @@ const Index = () => {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <AirQualityCard 
-                level="Bon" 
-                index={3} 
-                pollutant="Principalement NO₂"
-                description="La qualité de l'air est bonne aujourd'hui à Paris. Idéal pour les activités extérieures."
-              />
+              <AirQualityCard level="Bon" index={3} pollutant="Principalement NO₂" description="La qualité de l'air est bonne aujourd'hui à Paris. Idéal pour les activités extérieures." />
             </div>
             <Card className="overflow-hidden card-hover">
               <CardContent className="p-0">
@@ -140,15 +124,7 @@ const Index = () => {
             Découvrez nos écogestes
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {ecoTips.map((tip, index) => (
-              <EcoTipsCard
-                key={index}
-                title={tip.title}
-                description={tip.description}
-                icon={tip.icon}
-                moreLink={tip.moreLink}
-              />
-            ))}
+            {ecoTips.map((tip, index) => <EcoTipsCard key={index} title={tip.title} description={tip.description} icon={tip.icon} moreLink={tip.moreLink} />)}
           </div>
           <div className="mt-8 text-center">
             <Link to="/eco-tips">
@@ -235,8 +211,6 @@ const Index = () => {
           </div>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
