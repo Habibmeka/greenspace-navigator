@@ -10,15 +10,15 @@ interface GreenSpaceRecord {
   fields: {
     nom_ev: string;
     type_ev: string;
-    adresse_ev?: string;
+    adresse_complete?: string;
     arrondissement: string;
-    surface?: number;
+    surface_totale_reelle?: number;
     geo_point_2d: {
       lon: number;
       lat: number;
     };
     equipement?: string[];
-    horaire?: string;
+    horaire_ouverture?: string;
   };
 }
 
@@ -109,7 +109,7 @@ const InteractiveMap: React.FC = () => {
             
             <div className="flex-1 overflow-auto p-4">
               <h2 className="text-xl font-bold mb-2">{selectedPark.fields.nom_ev}</h2>
-              <p className="text-gray-600 mb-4">{selectedPark.fields.adresse_ev || 'Adresse non disponible'}</p>
+              <p className="text-gray-600 mb-4">{selectedPark.fields.adresse_complete || 'Adresse non disponible'}</p>
               
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <div className="bg-greenspace-neutral rounded-lg p-3 text-center">
@@ -121,7 +121,7 @@ const InteractiveMap: React.FC = () => {
                   <Leaf className="h-5 w-5 mx-auto mb-1 text-greenspace-primary" />
                   <p className="text-xs text-gray-500">Surface</p>
                   <p className="text-sm font-medium">
-                    {selectedPark.fields.surface ? `${selectedPark.fields.surface}m²` : 'N/A'}
+                    {selectedPark.fields.surface_totale_reelle ? `${selectedPark.fields.surface_totale_reelle}m²` : 'N/A'}
                   </p>
                 </div>
               </div>
@@ -131,13 +131,13 @@ const InteractiveMap: React.FC = () => {
                 <p className="text-sm text-gray-600">{selectedPark.fields.type_ev}</p>
               </div>
               
-              {selectedPark.fields.horaire && (
+              {selectedPark.fields.horaire_ouverture && (
                 <div className="mb-4">
                   <h3 className="text-lg font-semibold mb-2 flex items-center">
                     <Clock className="h-4 w-4 mr-2" />
                     Horaires
                   </h3>
-                  <p className="text-sm text-gray-600">{selectedPark.fields.horaire}</p>
+                  <p className="text-sm text-gray-600">{selectedPark.fields.horaire_ouverture}</p>
                 </div>
               )}
               
@@ -172,7 +172,7 @@ const InteractiveMap: React.FC = () => {
               </div>
               <div className="text-center">
                 <p className="text-2xl font-bold text-greenspace-primary">
-                  {Math.round(parks.reduce((sum, park) => sum + (park.fields.surface || 0), 0) / 10000)}
+                  {Math.round(parks.reduce((sum, park) => sum + (park.fields.surface_totale_reelle || 0), 0) / 10000)}
                 </p>
                 <p className="text-xs text-gray-600">Hectares</p>
               </div>
