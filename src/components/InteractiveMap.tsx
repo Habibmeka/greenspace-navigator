@@ -10,21 +10,25 @@ interface GreenSpaceRecord {
   fields: {
     nom_ev: string;
     type_ev: string;
-    adresse_complete: string;
+    adresse_ev?: string;
     arrondissement: string;
-    surface: number;
+    surface?: number;
     geo_point_2d: {
       lon: number;
       lat: number;
     };
-    equipement: string[];
-    horaire: string;
+    equipement?: string[];
+    horaire?: string;
   };
 }
 
 const InteractiveMap: React.FC = () => {
   const { data, isLoading, error } = useParisGreenSpaces();
   const [selectedPark, setSelectedPark] = useState<GreenSpaceRecord | null>(null);
+
+  console.log('Green spaces data:', data);
+  console.log('Loading state:', isLoading);
+  console.log('Error state:', error);
 
   if (isLoading) {
     return (
@@ -38,9 +42,13 @@ const InteractiveMap: React.FC = () => {
   }
 
   if (error) {
+    console.error('Error loading green spaces:', error);
     return (
       <div className="w-full h-[600px] bg-red-50 rounded-lg flex items-center justify-center">
-        <p className="text-red-600">Erreur lors du chargement des données</p>
+        <div className="text-center">
+          <p className="text-red-600 mb-2">Erreur lors du chargement des données</p>
+          <p className="text-sm text-gray-500">{error.message}</p>
+        </div>
       </div>
     );
   }
@@ -101,7 +109,7 @@ const InteractiveMap: React.FC = () => {
             
             <div className="flex-1 overflow-auto p-4">
               <h2 className="text-xl font-bold mb-2">{selectedPark.fields.nom_ev}</h2>
-              <p className="text-gray-600 mb-4">{selectedPark.fields.adresse_complete}</p>
+              <p className="text-gray-600 mb-4">{selectedPark.fields.adresse_ev || 'Adresse non disponible'}</p>
               
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <div className="bg-greenspace-neutral rounded-lg p-3 text-center">
