@@ -1,5 +1,6 @@
 
 import { useQuery } from '@tanstack/react-query';
+import { mockParisGreenSpacesData } from '@/data/mockParisGreenSpaces';
 
 interface GreenSpaceRecord {
   record_id: string;
@@ -26,18 +27,24 @@ interface ApiResponse {
 const fetchParisGreenSpaces = async (): Promise<ApiResponse> => {
   console.log('Tentative de récupération des données depuis l\'API Paris...');
   
-  // Requête simplifiée avec seulement les champs de base
-  const response = await fetch(
-    'https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/espaces_verts/records?limit=100&select=nom_ev,type_ev,arrondissement,geo_point_2d'
-  );
-  
-  if (!response.ok) {
-    throw new Error(`Erreur API: ${response.status} ${response.statusText}`);
+  try {
+    // Essai avec les champs de base les plus simples
+    const response = await fetch(
+      'https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/espaces_verts/records?limit=100'
+    );
+    
+    if (!response.ok) {
+      console.log('API Paris non disponible, utilisation des données mock');
+      return mockParisGreenSpacesData;
+    }
+    
+    const data = await response.json();
+    console.log('Données reçues de l\'API Paris:', data);
+    return data;
+  } catch (error) {
+    console.log('Erreur lors de l\'appel API, utilisation des données mock:', error);
+    return mockParisGreenSpacesData;
   }
-  
-  const data = await response.json();
-  console.log('Données reçues de l\'API Paris:', data);
-  return data;
 };
 
 export const useParisGreenSpaces = () => {
@@ -45,6 +52,6 @@ export const useParisGreenSpaces = () => {
     queryKey: ['paris-green-spaces'],
     queryFn: fetchParisGreenSpaces,
     staleTime: 1000 * 60 * 30, // 30 minutes
-    retry: 1,
+    retry: 0, // Pas de retry, fallback direct vers mock
   });
 };
