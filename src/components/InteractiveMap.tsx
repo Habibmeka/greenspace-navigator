@@ -10,7 +10,7 @@ interface GreenSpaceRecord {
   fields: {
     nom_ev: string;
     type_ev: string;
-    adresse_complete?: string;
+    adresse_ev?: string;
     arrondissement: string;
     surface_totale_reelle?: number;
     geo_point_2d: {
@@ -48,12 +48,14 @@ const InteractiveMap: React.FC = () => {
         <div className="text-center">
           <p className="text-red-600 mb-2">Erreur lors du chargement des données</p>
           <p className="text-sm text-gray-500">{error.message}</p>
+          <p className="text-xs text-gray-400 mt-2">Vérification de la connexion à l'API Paris Open Data...</p>
         </div>
       </div>
     );
   }
 
   const parks = data?.results || [];
+  console.log('Number of parks:', parks.length);
 
   return (
     <div className="relative w-full h-[600px] rounded-lg overflow-hidden">
@@ -109,7 +111,7 @@ const InteractiveMap: React.FC = () => {
             
             <div className="flex-1 overflow-auto p-4">
               <h2 className="text-xl font-bold mb-2">{selectedPark.fields.nom_ev}</h2>
-              <p className="text-gray-600 mb-4">{selectedPark.fields.adresse_complete || 'Adresse non disponible'}</p>
+              <p className="text-gray-600 mb-4">{selectedPark.fields.adresse_ev || 'Adresse non disponible'}</p>
               
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <div className="bg-greenspace-neutral rounded-lg p-3 text-center">

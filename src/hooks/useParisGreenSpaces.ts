@@ -6,7 +6,7 @@ interface GreenSpaceRecord {
   fields: {
     nom_ev: string;
     type_ev: string;
-    adresse_complete?: string;
+    adresse_ev?: string;
     arrondissement: string;
     surface_totale_reelle?: number;
     geo_point_2d: {
@@ -26,8 +26,9 @@ interface ApiResponse {
 const fetchParisGreenSpaces = async (): Promise<ApiResponse> => {
   console.log('Tentative de récupération des données depuis l\'API Paris...');
   
+  // Requête simplifiée avec seulement les champs de base
   const response = await fetch(
-    'https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/espaces_verts/records?limit=100&select=nom_ev,type_ev,adresse_complete,arrondissement,surface_totale_reelle,geo_point_2d,equipement,horaire_ouverture'
+    'https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/espaces_verts/records?limit=100&select=nom_ev,type_ev,arrondissement,geo_point_2d'
   );
   
   if (!response.ok) {
