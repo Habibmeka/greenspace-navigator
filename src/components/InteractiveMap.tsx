@@ -43,6 +43,7 @@ const InteractiveMap: React.FC = () => {
 
   const parks = data?.results || [];
   console.log('Number of parks:', parks.length);
+  console.log('First park example:', parks[0]);
 
   // Si pas de données, afficher un message informatif
   if (parks.length === 0) {
@@ -73,29 +74,37 @@ const InteractiveMap: React.FC = () => {
         
         {/* Points des espaces verts */}
         <div className="absolute inset-0">
-          {parks.slice(0, 20).map((park, index) => (
-            <div
-              key={park.record_id}
-              className="absolute cursor-pointer transform -translate-x-1/2 -translate-y-1/2 hover:scale-110 transition-transform"
-              style={{
-                left: `${30 + (index % 8) * 8}%`,
-                top: `${25 + Math.floor(index / 8) * 15}%`,
-              }}
-              onClick={() => setSelectedPark(park)}
-            >
-              <div className="w-6 h-6 rounded-full bg-greenspace-primary shadow-lg flex items-center justify-center animate-pulse">
-                <MapPin className="h-4 w-4 text-white" />
+          {parks.slice(0, 20).map((park, index) => {
+            // Vérification de sécurité pour éviter les erreurs
+            if (!park || !park.fields) {
+              console.warn('Park data is invalid:', park);
+              return null;
+            }
+            
+            return (
+              <div
+                key={park.record_id || `park-${index}`}
+                className="absolute cursor-pointer transform -translate-x-1/2 -translate-y-1/2 hover:scale-110 transition-transform"
+                style={{
+                  left: `${30 + (index % 8) * 8}%`,
+                  top: `${25 + Math.floor(index / 8) * 15}%`,
+                }}
+                onClick={() => setSelectedPark(park)}
+              >
+                <div className="w-6 h-6 rounded-full bg-greenspace-primary shadow-lg flex items-center justify-center animate-pulse">
+                  <MapPin className="h-4 w-4 text-white" />
+                </div>
+                <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 bg-white px-2 py-1 rounded shadow-md text-xs whitespace-nowrap opacity-0 hover:opacity-100 transition-opacity">
+                  {park.fields.nom_ev || 'Espace vert'}
+                </div>
               </div>
-              <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 bg-white px-2 py-1 rounded shadow-md text-xs whitespace-nowrap opacity-0 hover:opacity-100 transition-opacity">
-                {park.fields.nom_ev}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
       {/* Panneau d'information */}
-      {selectedPark && (
+      {selectedPark && selectedPark.fields && (
         <div className="absolute inset-y-0 right-0 w-full md:w-96 bg-white shadow-lg z-20 transform transition-transform">
           <div className="h-full flex flex-col">
             <div className="p-4 border-b flex items-center justify-between">
@@ -110,7 +119,7 @@ const InteractiveMap: React.FC = () => {
             </div>
             
             <div className="flex-1 overflow-auto p-4">
-              <h2 className="text-xl font-bold mb-2">{selectedPark.fields.nom_ev}</h2>
+              <h2 className="text-xl font-bold mb-2">{selectedPark.fields.nom_ev || 'Espace vert'}</h2>
               <p className="text-gray-600 mb-4">{selectedPark.fields.adresse_ev || 'Adresse non disponible'}</p>
               
               <div className="grid grid-cols-2 gap-4 mb-6">
@@ -130,7 +139,7 @@ const InteractiveMap: React.FC = () => {
               
               <div className="mb-4">
                 <h3 className="text-lg font-semibold mb-2">Type d'espace</h3>
-                <p className="text-sm text-gray-600">{selectedPark.fields.type_ev}</p>
+                <p className="text-sm text-gray-600">{selectedPark.fields.type_ev || 'Espace vert'}</p>
               </div>
               
               {selectedPark.fields.horaire_ouverture && (
@@ -174,7 +183,7 @@ const InteractiveMap: React.FC = () => {
               </div>
               <div className="text-center">
                 <p className="text-2xl font-bold text-greenspace-primary">
-                  {Math.round(parks.reduce((sum, park) => sum + (park.fields.surface_totale_reelle || 0), 0) / 10000)}
+                  {Math.round(parks.reduce((sum, park) => sum + (park.fields?.surface_totale_reelle || 0), 0) / 10000)}
                 </p>
                 <p className="text-xs text-gray-600">Hectares</p>
               </div>
