@@ -30,29 +30,14 @@ const InteractiveMap: React.FC = () => {
   console.log('Loading state:', isLoading);
   console.log('Error state:', error);
 
+  const parks = data?.results || [];
+
   if (isLoading) {
     return (
-      <div className="w-full h-[600px] bg-greenspace-neutral rounded-lg flex items-center justify-center">
+      <div className="w-full h-[600px] bg-gray-100 rounded-lg flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-greenspace-primary mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Chargement des espaces verts...</p>
-        </div>
-      </div>
-    );
-  }
-
-  const parks = data?.results || [];
-  console.log('Number of parks:', parks.length);
-  console.log('First park example:', parks[0]);
-
-  // Si pas de données, afficher un message informatif
-  if (parks.length === 0) {
-    return (
-      <div className="w-full h-[600px] bg-greenspace-neutral rounded-lg flex items-center justify-center">
-        <div className="text-center">
-          <Leaf className="h-16 w-16 text-greenspace-primary mx-auto mb-4" />
-          <p className="text-gray-600 mb-2">Données des espaces verts non disponibles</p>
-          <p className="text-sm text-gray-500">Utilisation des données locales</p>
         </div>
       </div>
     );
@@ -60,51 +45,42 @@ const InteractiveMap: React.FC = () => {
 
   return (
     <div className="relative w-full h-[600px] rounded-lg overflow-hidden">
-      {/* Fond de carte de Paris */}
-      <div className="absolute inset-0 bg-greenspace-neutral">
-        <div 
-          className="absolute inset-0 bg-cover bg-center"
-          style={{
-            backgroundImage: `url('/lovable-uploads/80208021-a061-4c96-bb4e-9f1e7eff2aa3.png')`
-          }}
-        >
-          {/* Overlay pour améliorer la lisibilité */}
-          <div className="absolute inset-0 bg-black/10"></div>
-        </div>
-        
-        {/* Points des espaces verts */}
+      {/* Fond de carte stylisé */}
+      <div className="absolute inset-0 bg-gradient-to-br from-green-100 via-green-50 to-blue-50">
+        {/* Simulation d'une carte avec des formes géométriques */}
         <div className="absolute inset-0">
-          {parks.slice(0, 20).map((park, index) => {
-            // Vérification de sécurité pour éviter les erreurs
-            if (!park || !park.fields) {
-              console.warn('Park data is invalid:', park);
-              return null;
-            }
-            
-            return (
-              <div
-                key={park.record_id || `park-${index}`}
-                className="absolute cursor-pointer transform -translate-x-1/2 -translate-y-1/2 hover:scale-110 transition-transform"
-                style={{
-                  left: `${30 + (index % 8) * 8}%`,
-                  top: `${25 + Math.floor(index / 8) * 15}%`,
-                }}
-                onClick={() => setSelectedPark(park)}
-              >
-                <div className="w-6 h-6 rounded-full bg-greenspace-primary shadow-lg flex items-center justify-center animate-pulse">
-                  <MapPin className="h-4 w-4 text-white" />
-                </div>
-                <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 bg-white px-2 py-1 rounded shadow-md text-xs whitespace-nowrap opacity-0 hover:opacity-100 transition-opacity">
-                  {park.fields.nom_ev || 'Espace vert'}
-                </div>
+          {/* Rivière Seine stylisée */}
+          <div className="absolute top-1/2 left-0 w-full h-8 bg-blue-200 opacity-60 transform -rotate-12"></div>
+          
+          {/* Zones vertes de fond */}
+          <div className="absolute top-10 left-10 w-20 h-20 bg-green-200 rounded-full opacity-40"></div>
+          <div className="absolute top-32 right-20 w-16 h-16 bg-green-300 rounded-full opacity-40"></div>
+          <div className="absolute bottom-20 left-1/3 w-24 h-24 bg-green-200 rounded-full opacity-40"></div>
+          
+          {/* Points des espaces verts */}
+          {parks.slice(0, 15).map((park, index) => (
+            <div
+              key={park.record_id || `park-${index}`}
+              className="absolute cursor-pointer transform -translate-x-1/2 -translate-y-1/2 hover:scale-110 transition-transform"
+              style={{
+                left: `${20 + (index % 5) * 15}%`,
+                top: `${20 + Math.floor(index / 5) * 20}%`,
+              }}
+              onClick={() => setSelectedPark(park)}
+            >
+              <div className="w-6 h-6 rounded-full bg-green-600 shadow-lg flex items-center justify-center animate-pulse">
+                <MapPin className="h-4 w-4 text-white" />
               </div>
-            );
-          })}
+              <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 bg-white px-2 py-1 rounded shadow-md text-xs whitespace-nowrap opacity-0 hover:opacity-100 transition-opacity">
+                {park.fields?.nom_ev || 'Espace vert'}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
       {/* Panneau d'information */}
-      {selectedPark && selectedPark.fields && (
+      {selectedPark && (
         <div className="absolute inset-y-0 right-0 w-full md:w-96 bg-white shadow-lg z-20 transform transition-transform">
           <div className="h-full flex flex-col">
             <div className="p-4 border-b flex items-center justify-between">
@@ -119,30 +95,30 @@ const InteractiveMap: React.FC = () => {
             </div>
             
             <div className="flex-1 overflow-auto p-4">
-              <h2 className="text-xl font-bold mb-2">{selectedPark.fields.nom_ev || 'Espace vert'}</h2>
-              <p className="text-gray-600 mb-4">{selectedPark.fields.adresse_ev || 'Adresse non disponible'}</p>
+              <h2 className="text-xl font-bold mb-2">{selectedPark.fields?.nom_ev || 'Espace vert'}</h2>
+              <p className="text-gray-600 mb-4">{selectedPark.fields?.adresse_ev || 'Adresse non disponible'}</p>
               
               <div className="grid grid-cols-2 gap-4 mb-6">
-                <div className="bg-greenspace-neutral rounded-lg p-3 text-center">
-                  <MapPin className="h-5 w-5 mx-auto mb-1 text-greenspace-primary" />
+                <div className="bg-green-50 rounded-lg p-3 text-center">
+                  <MapPin className="h-5 w-5 mx-auto mb-1 text-green-600" />
                   <p className="text-xs text-gray-500">Arrondissement</p>
-                  <p className="text-sm font-medium">{selectedPark.fields.arrondissement || 'N/A'}</p>
+                  <p className="text-sm font-medium">{selectedPark.fields?.arrondissement || 'N/A'}</p>
                 </div>
-                <div className="bg-greenspace-neutral rounded-lg p-3 text-center">
-                  <Leaf className="h-5 w-5 mx-auto mb-1 text-greenspace-primary" />
+                <div className="bg-green-50 rounded-lg p-3 text-center">
+                  <Leaf className="h-5 w-5 mx-auto mb-1 text-green-600" />
                   <p className="text-xs text-gray-500">Surface</p>
                   <p className="text-sm font-medium">
-                    {selectedPark.fields.surface_totale_reelle ? `${selectedPark.fields.surface_totale_reelle}m²` : 'N/A'}
+                    {selectedPark.fields?.surface_totale_reelle ? `${selectedPark.fields.surface_totale_reelle}m²` : 'N/A'}
                   </p>
                 </div>
               </div>
               
               <div className="mb-4">
                 <h3 className="text-lg font-semibold mb-2">Type d'espace</h3>
-                <p className="text-sm text-gray-600">{selectedPark.fields.type_ev || 'Espace vert'}</p>
+                <p className="text-sm text-gray-600">{selectedPark.fields?.type_ev || 'Espace vert'}</p>
               </div>
               
-              {selectedPark.fields.horaire_ouverture && (
+              {selectedPark.fields?.horaire_ouverture && (
                 <div className="mb-4">
                   <h3 className="text-lg font-semibold mb-2 flex items-center">
                     <Clock className="h-4 w-4 mr-2" />
@@ -152,14 +128,14 @@ const InteractiveMap: React.FC = () => {
                 </div>
               )}
               
-              {selectedPark.fields.equipement && selectedPark.fields.equipement.length > 0 && (
+              {selectedPark.fields?.equipement && selectedPark.fields.equipement.length > 0 && (
                 <div className="mb-4">
                   <h3 className="text-lg font-semibold mb-2">Équipements</h3>
                   <div className="flex flex-wrap gap-2">
                     {selectedPark.fields.equipement.map((eq, index) => (
                       <span 
                         key={index}
-                        className="px-2 py-1 bg-greenspace-primary/10 text-greenspace-primary text-xs rounded-full"
+                        className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full"
                       >
                         {eq}
                       </span>
@@ -178,11 +154,11 @@ const InteractiveMap: React.FC = () => {
           <CardContent className="p-4">
             <div className="flex items-center space-x-4">
               <div className="text-center">
-                <p className="text-2xl font-bold text-greenspace-primary">{parks.length}</p>
+                <p className="text-2xl font-bold text-green-600">{parks.length}</p>
                 <p className="text-xs text-gray-600">Espaces verts</p>
               </div>
               <div className="text-center">
-                <p className="text-2xl font-bold text-greenspace-primary">
+                <p className="text-2xl font-bold text-green-600">
                   {Math.round(parks.reduce((sum, park) => sum + (park.fields?.surface_totale_reelle || 0), 0) / 10000)}
                 </p>
                 <p className="text-xs text-gray-600">Hectares</p>
