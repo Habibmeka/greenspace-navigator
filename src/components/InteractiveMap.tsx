@@ -257,7 +257,7 @@ const InteractiveMap: React.FC = () => {
                 </div>
               </div>
             </CardContent>
-          </div>
+          </Card>
         </div>
       </div>
     </>
