@@ -2,8 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { MapPin, Clock, Leaf, ArrowLeft, Settings } from 'lucide-react';
+import { MapPin, Clock, Leaf, ArrowLeft } from 'lucide-react';
 import { useParisGreenSpaces } from '@/hooks/useParisGreenSpaces';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -30,15 +29,14 @@ const InteractiveMap: React.FC = () => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [selectedPark, setSelectedPark] = useState<GreenSpaceRecord | null>(null);
-  const [mapboxToken, setMapboxToken] = useState('');
-  const [showTokenInput, setShowTokenInput] = useState(true);
   const markers = useRef<mapboxgl.Marker[]>([]);
 
   const parks = data?.results || [];
+  const mapboxToken = 'pk.eyJ1IjoiaGFiaWJtZWthIiwiYSI6ImNtY2l2bmlsZTEzNDgybHF4d3pma2tpcmEifQ.2VzNf3TJWgYs2kn-a3iTxw';
 
   // Initialiser la carte Mapbox
   useEffect(() => {
-    if (!mapContainer.current || !mapboxToken) return;
+    if (!mapContainer.current) return;
 
     // Définir le token d'accès Mapbox
     mapboxgl.accessToken = mapboxToken;
@@ -66,7 +64,7 @@ const InteractiveMap: React.FC = () => {
     return () => {
       map.current?.remove();
     };
-  }, [mapboxToken, parks]);
+  }, [parks]);
 
   // Ajouter les marqueurs des espaces verts
   const addMarkersToMap = () => {
@@ -76,20 +74,18 @@ const InteractiveMap: React.FC = () => {
       if (park.fields?.geo_point_2d) {
         // Créer un élément DOM pour le marqueur
         const el = document.createElement('div');
-        el.className = 'custom-marker';
+        el.className = 'mapbox-marker';
         el.style.width = '20px';
         el.style.height = '20px';
         el.style.borderRadius = '50%';
         el.style.backgroundColor = '#16a34a';
         el.style.border = '3px solid white';
-        el.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)';
+        el.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3), 0 0 0 0 rgba(22, 163, 74, 0.7)';
         el.style.cursor = 'pointer';
         el.style.display = 'flex';
         el.style.alignItems = 'center';
         el.style.justifyContent = 'center';
-
-        // Ajouter une animation pulse
-        el.style.animation = 'pulse 2s infinite';
+        el.style.animation = 'mapboxPulse 2s infinite';
 
         // Créer le marqueur
         const marker = new mapboxgl.Marker(el)
@@ -121,12 +117,6 @@ const InteractiveMap: React.FC = () => {
     });
   };
 
-  const handleTokenSubmit = () => {
-    if (mapboxToken.trim()) {
-      setShowTokenInput(false);
-    }
-  };
-
   if (isLoading) {
     return (
       <div className="w-full h-[600px] bg-gray-100 rounded-lg flex items-center justify-center">
@@ -139,176 +129,138 @@ const InteractiveMap: React.FC = () => {
   }
 
   return (
-    <div className="relative w-full h-[600px] rounded-lg overflow-hidden">
-      {/* Input pour le token Mapbox */}
-      {showTokenInput && (
-        <div className="absolute inset-0 bg-white/95 backdrop-blur-sm z-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full mx-4">
-            <h3 className="text-lg font-semibold mb-4">Configuration Mapbox</h3>
-            <p className="text-sm text-gray-600 mb-4">
-              Entrez votre token public Mapbox pour afficher la carte. 
-              <br />
-              <a href="https://mapbox.com/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                Créer un compte Mapbox
-              </a>
-            </p>
-            <div className="space-y-4">
-              <Input
-                type="text"
-                placeholder="pk.eyJ1IjoiVVNFUk5BTUUi..."
-                value={mapboxToken}
-                onChange={(e) => setMapboxToken(e.target.value)}
-                className="w-full"
-              />
-              <Button onClick={handleTokenSubmit} className="w-full">
-                Charger la carte
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Bouton pour reconfigurer le token */}
-      {!showTokenInput && (
-        <div className="absolute top-4 right-4 z-20">
-          <Button
-            variant="outline"
-            size="icon"
-            className="bg-white/90 backdrop-blur-sm hover:bg-white"
-            onClick={() => setShowTokenInput(true)}
-          >
-            <Settings className="h-4 w-4" />
-          </Button>
-        </div>
-      )}
-
-      {/* Container de la carte */}
-      <div ref={mapContainer} className="absolute inset-0" />
-
-      {/* Style CSS pour l'animation pulse */}
-      <style jsx>{`
-        @keyframes pulse {
-          0% {
-            box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7);
+    <>
+      {/* CSS pour l'animation des marqueurs */}
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          @keyframes mapboxPulse {
+            0% {
+              box-shadow: 0 2px 4px rgba(0,0,0,0.3), 0 0 0 0 rgba(22, 163, 74, 0.7);
+            }
+            70% {
+              box-shadow: 0 2px 4px rgba(0,0,0,0.3), 0 0 0 10px rgba(22, 163, 74, 0);
+            }
+            100% {
+              box-shadow: 0 2px 4px rgba(0,0,0,0.3), 0 0 0 0 rgba(22, 163, 74, 0);
+            }
           }
-          70% {
-            box-shadow: 0 0 0 10px rgba(22, 163, 74, 0);
-          }
-          100% {
-            box-shadow: 0 0 0 0 rgba(22, 163, 74, 0);
-          }
-        }
-      `}</style>
+        `
+      }} />
 
-      {/* Panneau d'information */}
-      {selectedPark && (
-        <div className="absolute inset-y-0 right-0 w-full md:w-96 bg-white shadow-xl z-30 transform transition-transform">
-          <div className="h-full flex flex-col">
-            <div className="p-4 border-b flex items-center justify-between bg-green-50">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => setSelectedPark(null)}
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Retour à la carte
-              </Button>
-            </div>
-            
-            <div className="flex-1 overflow-auto p-4">
-              <h2 className="text-xl font-bold mb-2 text-green-800">
-                {selectedPark.fields?.nom_ev || 'Espace vert'}
-              </h2>
-              <p className="text-gray-600 mb-4 flex items-center">
-                <MapPin className="h-4 w-4 mr-1" />
-                {selectedPark.fields?.adresse_ev || 'Adresse non disponible'}
-              </p>
-              
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                <div className="bg-green-50 rounded-lg p-3 text-center border border-green-100">
-                  <div className="w-8 h-8 mx-auto mb-2 bg-green-100 rounded-full flex items-center justify-center">
-                    <span className="text-green-600 font-bold text-sm">
-                      {selectedPark.fields?.arrondissement || 'N/A'}
-                    </span>
-                  </div>
-                  <p className="text-xs text-gray-500">Arrondissement</p>
-                </div>
-                <div className="bg-green-50 rounded-lg p-3 text-center border border-green-100">
-                  <Leaf className="h-8 w-8 mx-auto mb-2 text-green-600" />
-                  <p className="text-xs text-gray-500">Surface</p>
-                  <p className="text-sm font-medium">
-                    {selectedPark.fields?.surface_totale_reelle 
-                      ? `${Math.round(selectedPark.fields.surface_totale_reelle / 10000)} ha` 
-                      : 'N/A'}
-                  </p>
-                </div>
+      <div className="relative w-full h-[600px] rounded-lg overflow-hidden">
+        {/* Container de la carte */}
+        <div ref={mapContainer} className="absolute inset-0" />
+
+        {/* Panneau d'information */}
+        {selectedPark && (
+          <div className="absolute inset-y-0 right-0 w-full md:w-96 bg-white shadow-xl z-30 transform transition-transform">
+            <div className="h-full flex flex-col">
+              <div className="p-4 border-b flex items-center justify-between bg-green-50">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => setSelectedPark(null)}
+                >
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Retour à la carte
+                </Button>
               </div>
               
-              <div className="mb-4">
-                <h3 className="text-lg font-semibold mb-2 text-gray-800">Type d'espace</h3>
-                <span className="inline-block px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
-                  {selectedPark.fields?.type_ev || 'Espace vert'}
-                </span>
-              </div>
-              
-              {selectedPark.fields?.horaire_ouverture && (
-                <div className="mb-4">
-                  <h3 className="text-lg font-semibold mb-2 flex items-center text-gray-800">
-                    <Clock className="h-4 w-4 mr-2" />
-                    Horaires d'ouverture
-                  </h3>
-                  <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
-                    {selectedPark.fields.horaire_ouverture}
-                  </p>
-                </div>
-              )}
-              
-              {selectedPark.fields?.equipement && selectedPark.fields.equipement.length > 0 && (
-                <div className="mb-4">
-                  <h3 className="text-lg font-semibold mb-2 text-gray-800">Équipements disponibles</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedPark.fields.equipement.map((eq, index) => (
-                      <span 
-                        key={index}
-                        className="px-3 py-1 bg-blue-100 text-blue-700 text-xs rounded-full border border-blue-200"
-                      >
-                        {eq}
+              <div className="flex-1 overflow-auto p-4">
+                <h2 className="text-xl font-bold mb-2 text-green-800">
+                  {selectedPark.fields?.nom_ev || 'Espace vert'}
+                </h2>
+                <p className="text-gray-600 mb-4 flex items-center">
+                  <MapPin className="h-4 w-4 mr-1" />
+                  {selectedPark.fields?.adresse_ev || 'Adresse non disponible'}
+                </p>
+                
+                <div className="grid grid-cols-2 gap-4 mb-6">
+                  <div className="bg-green-50 rounded-lg p-3 text-center border border-green-100">
+                    <div className="w-8 h-8 mx-auto mb-2 bg-green-100 rounded-full flex items-center justify-center">
+                      <span className="text-green-600 font-bold text-sm">
+                        {selectedPark.fields?.arrondissement || 'N/A'}
                       </span>
-                    ))}
+                    </div>
+                    <p className="text-xs text-gray-500">Arrondissement</p>
+                  </div>
+                  <div className="bg-green-50 rounded-lg p-3 text-center border border-green-100">
+                    <Leaf className="h-8 w-8 mx-auto mb-2 text-green-600" />
+                    <p className="text-xs text-gray-500">Surface</p>
+                    <p className="text-sm font-medium">
+                      {selectedPark.fields?.surface_totale_reelle 
+                        ? `${Math.round(selectedPark.fields.surface_totale_reelle / 10000)} ha` 
+                        : 'N/A'}
+                    </p>
                   </div>
                 </div>
-              )}
+                
+                <div className="mb-4">
+                  <h3 className="text-lg font-semibold mb-2 text-gray-800">Type d'espace</h3>
+                  <span className="inline-block px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
+                    {selectedPark.fields?.type_ev || 'Espace vert'}
+                  </span>
+                </div>
+                
+                {selectedPark.fields?.horaire_ouverture && (
+                  <div className="mb-4">
+                    <h3 className="text-lg font-semibold mb-2 flex items-center text-gray-800">
+                      <Clock className="h-4 w-4 mr-2" />
+                      Horaires d'ouverture
+                    </h3>
+                    <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
+                      {selectedPark.fields.horaire_ouverture}
+                    </p>
+                  </div>
+                )}
+                
+                {selectedPark.fields?.equipement && selectedPark.fields.equipement.length > 0 && (
+                  <div className="mb-4">
+                    <h3 className="text-lg font-semibold mb-2 text-gray-800">Équipements disponibles</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedPark.fields.equipement.map((eq, index) => (
+                        <span 
+                          key={index}
+                          className="px-3 py-1 bg-blue-100 text-blue-700 text-xs rounded-full border border-blue-200"
+                        >
+                          {eq}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
+        )}
+        
+        {/* Statistiques en overlay */}
+        <div className="absolute bottom-4 left-4">
+          <Card className="bg-white/95 backdrop-blur-sm shadow-lg">
+            <CardContent className="p-4">
+              <div className="flex items-center space-x-6">
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-green-600">{parks.length}</p>
+                  <p className="text-xs text-gray-600">Espaces verts</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-green-600">
+                    {Math.round(parks.reduce((sum, park) => sum + (park.fields?.surface_totale_reelle || 0), 0) / 10000)}
+                  </p>
+                  <p className="text-xs text-gray-600">Hectares total</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-green-600">
+                    {new Set(parks.map(park => park.fields?.arrondissement)).size}
+                  </p>
+                  <p className="text-xs text-gray-600">Arrondissements</p>
+                </div>
+              </div>
+            </CardContent>
+          </div>
         </div>
-      )}
-      
-      {/* Statistiques en overlay */}
-      <div className="absolute bottom-4 left-4">
-        <Card className="bg-white/95 backdrop-blur-sm shadow-lg">
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-6">
-              <div className="text-center">
-                <p className="text-2xl font-bold text-green-600">{parks.length}</p>
-                <p className="text-xs text-gray-600">Espaces verts</p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-green-600">
-                  {Math.round(parks.reduce((sum, park) => sum + (park.fields?.surface_totale_reelle || 0), 0) / 10000)}
-                </p>
-                <p className="text-xs text-gray-600">Hectares total</p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-green-600">
-                  {new Set(parks.map(park => park.fields?.arrondissement)).size}
-                </p>
-                <p className="text-xs text-gray-600">Arrondissements</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
-    </div>
+    </>
   );
 };
 
