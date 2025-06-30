@@ -2,8 +2,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { MapPin, Clock, Leaf, ArrowLeft, Plus, Minus, RotateCcw } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { MapPin, Clock, Leaf, ArrowLeft, Settings } from 'lucide-react';
 import { useParisGreenSpaces } from '@/hooks/useParisGreenSpaces';
+import mapboxgl from 'mapbox-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
 
 interface GreenSpaceRecord {
   record_id: string;
@@ -24,69 +27,103 @@ interface GreenSpaceRecord {
 
 const InteractiveMap: React.FC = () => {
   const { data, isLoading, error } = useParisGreenSpaces();
+  const mapContainer = useRef<HTMLDivElement>(null);
+  const map = useRef<mapboxgl.Map | null>(null);
   const [selectedPark, setSelectedPark] = useState<GreenSpaceRecord | null>(null);
-  const [zoom, setZoom] = useState(1);
-  const [pan, setPan] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  const mapRef = useRef<HTMLDivElement>(null);
+  const [mapboxToken, setMapboxToken] = useState('');
+  const [showTokenInput, setShowTokenInput] = useState(true);
+  const markers = useRef<mapboxgl.Marker[]>([]);
 
   const parks = data?.results || [];
 
-  // Fonction pour convertir les coordonnées géographiques en position sur la carte
-  const convertGeoToMapPosition = (lon: number, lat: number) => {
-    // Paris bounds approximatifs
-    const parisCenter = { lon: 2.3522, lat: 48.8566 };
-    const bounds = {
-      minLon: 2.224,
-      maxLon: 2.469,
-      minLat: 48.815,
-      maxLat: 48.902
+  // Initialiser la carte Mapbox
+  useEffect(() => {
+    if (!mapContainer.current || !mapboxToken) return;
+
+    // Définir le token d'accès Mapbox
+    mapboxgl.accessToken = mapboxToken;
+
+    // Créer la carte
+    map.current = new mapboxgl.Map({
+      container: mapContainer.current,
+      style: 'mapbox://styles/mapbox/streets-v12',
+      center: [2.3522, 48.8566], // Centre de Paris
+      zoom: 11
+    });
+
+    // Ajouter les contrôles de navigation
+    map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+
+    // Nettoyer les anciens marqueurs
+    markers.current.forEach(marker => marker.remove());
+    markers.current = [];
+
+    // Attendre que la carte soit chargée avant d'ajouter les marqueurs
+    map.current.on('load', () => {
+      addMarkersToMap();
+    });
+
+    return () => {
+      map.current?.remove();
     };
+  }, [mapboxToken, parks]);
 
-    const x = ((lon - bounds.minLon) / (bounds.maxLon - bounds.minLon)) * 100;
-    const y = ((bounds.maxLat - lat) / (bounds.maxLat - bounds.minLat)) * 100;
+  // Ajouter les marqueurs des espaces verts
+  const addMarkersToMap = () => {
+    if (!map.current) return;
 
-    return { x: Math.max(5, Math.min(95, x)), y: Math.max(5, Math.min(95, y)) };
-  };
+    parks.forEach((park) => {
+      if (park.fields?.geo_point_2d) {
+        // Créer un élément DOM pour le marqueur
+        const el = document.createElement('div');
+        el.className = 'custom-marker';
+        el.style.width = '20px';
+        el.style.height = '20px';
+        el.style.borderRadius = '50%';
+        el.style.backgroundColor = '#16a34a';
+        el.style.border = '3px solid white';
+        el.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)';
+        el.style.cursor = 'pointer';
+        el.style.display = 'flex';
+        el.style.alignItems = 'center';
+        el.style.justifyContent = 'center';
 
-  const handleZoomIn = () => {
-    setZoom(prev => Math.min(prev * 1.2, 3));
-  };
+        // Ajouter une animation pulse
+        el.style.animation = 'pulse 2s infinite';
 
-  const handleZoomOut = () => {
-    setZoom(prev => Math.max(prev / 1.2, 0.5));
-  };
+        // Créer le marqueur
+        const marker = new mapboxgl.Marker(el)
+          .setLngLat([park.fields.geo_point_2d.lon, park.fields.geo_point_2d.lat])
+          .addTo(map.current as mapboxgl.Map);
 
-  const handleReset = () => {
-    setZoom(1);
-    setPan({ x: 0, y: 0 });
-  };
+        // Ajouter un événement de clic
+        el.addEventListener('click', () => {
+          setSelectedPark(park);
+        });
 
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (selectedPark) return; // Ne pas permettre le drag si un parc est sélectionné
-    setIsDragging(true);
-    setDragStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
-  };
+        // Ajouter un popup au survol
+        const popup = new mapboxgl.Popup({
+          offset: 25,
+          closeButton: false,
+          closeOnClick: false
+        }).setHTML(`<div class="p-2"><strong>${park.fields.nom_ev}</strong><br/>${park.fields.type_ev}</div>`);
 
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging) return;
-    setPan({
-      x: e.clientX - dragStart.x,
-      y: e.clientY - dragStart.y
+        el.addEventListener('mouseenter', () => {
+          marker.setPopup(popup).togglePopup();
+        });
+
+        el.addEventListener('mouseleave', () => {
+          popup.remove();
+        });
+
+        markers.current.push(marker);
+      }
     });
   };
 
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
-  const handleWheel = (e: React.WheelEvent) => {
-    e.preventDefault();
-    if (e.deltaY > 0) {
-      handleZoomOut();
-    } else {
-      handleZoomIn();
+  const handleTokenSubmit = () => {
+    if (mapboxToken.trim()) {
+      setShowTokenInput(false);
     }
   };
 
@@ -103,94 +140,65 @@ const InteractiveMap: React.FC = () => {
 
   return (
     <div className="relative w-full h-[600px] rounded-lg overflow-hidden">
-      {/* Carte interactive */}
-      <div
-        ref={mapRef}
-        className="absolute inset-0 cursor-grab active:cursor-grabbing"
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
-        onWheel={handleWheel}
-        style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
-      >
-        {/* Fond de carte de Paris avec image */}
-        <div
-          className="absolute inset-0 bg-cover bg-center transition-transform duration-200"
-          style={{
-            backgroundImage: `url('/lovable-uploads/c199e465-6191-4eb7-aefb-882e131a644d.png')`,
-            transform: `scale(${zoom}) translate(${pan.x / zoom}px, ${pan.y / zoom}px)`,
-          }}
-        >
-          {/* Overlay pour améliorer la lisibilité */}
-          <div className="absolute inset-0 bg-green-50/20"></div>
-
-          {/* Points des espaces verts positionnés géographiquement */}
-          {parks.map((park, index) => {
-            const position = convertGeoToMapPosition(
-              park.fields?.geo_point_2d?.lon || 2.3522,
-              park.fields?.geo_point_2d?.lat || 48.8566
-            );
-
-            return (
-              <div
-                key={park.record_id || `park-${index}`}
-                className="absolute cursor-pointer transform -translate-x-1/2 -translate-y-1/2 hover:scale-125 transition-all duration-200 z-10"
-                style={{
-                  left: `${position.x}%`,
-                  top: `${position.y}%`,
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSelectedPark(park);
-                }}
-              >
-                <div className="relative">
-                  <div className="w-4 h-4 rounded-full bg-green-600 shadow-lg flex items-center justify-center animate-pulse border-2 border-white">
-                    <div className="w-2 h-2 rounded-full bg-white"></div>
-                  </div>
-                  <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-black/80 text-white px-2 py-1 rounded text-xs whitespace-nowrap opacity-0 hover:opacity-100 transition-opacity pointer-events-none">
-                    {park.fields?.nom_ev || 'Espace vert'}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+      {/* Input pour le token Mapbox */}
+      {showTokenInput && (
+        <div className="absolute inset-0 bg-white/95 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full mx-4">
+            <h3 className="text-lg font-semibold mb-4">Configuration Mapbox</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Entrez votre token public Mapbox pour afficher la carte. 
+              <br />
+              <a href="https://mapbox.com/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                Créer un compte Mapbox
+              </a>
+            </p>
+            <div className="space-y-4">
+              <Input
+                type="text"
+                placeholder="pk.eyJ1IjoiVVNFUk5BTUUi..."
+                value={mapboxToken}
+                onChange={(e) => setMapboxToken(e.target.value)}
+                className="w-full"
+              />
+              <Button onClick={handleTokenSubmit} className="w-full">
+                Charger la carte
+              </Button>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Contrôles de zoom */}
-      <div className="absolute top-4 right-4 flex flex-col gap-2 z-20">
-        <Button
-          variant="outline"
-          size="icon"
-          className="bg-white/90 backdrop-blur-sm hover:bg-white"
-          onClick={handleZoomIn}
-        >
-          <Plus className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="outline"
-          size="icon"
-          className="bg-white/90 backdrop-blur-sm hover:bg-white"
-          onClick={handleZoomOut}
-        >
-          <Minus className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="outline"
-          size="icon"
-          className="bg-white/90 backdrop-blur-sm hover:bg-white"
-          onClick={handleReset}
-        >
-          <RotateCcw className="h-4 w-4" />
-        </Button>
-      </div>
+      {/* Bouton pour reconfigurer le token */}
+      {!showTokenInput && (
+        <div className="absolute top-4 right-4 z-20">
+          <Button
+            variant="outline"
+            size="icon"
+            className="bg-white/90 backdrop-blur-sm hover:bg-white"
+            onClick={() => setShowTokenInput(true)}
+          >
+            <Settings className="h-4 w-4" />
+          </Button>
+        </div>
+      )}
 
-      {/* Indicateur de zoom */}
-      <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-2 rounded-lg shadow-sm z-20">
-        <p className="text-sm font-medium">Zoom: {Math.round(zoom * 100)}%</p>
-      </div>
+      {/* Container de la carte */}
+      <div ref={mapContainer} className="absolute inset-0" />
+
+      {/* Style CSS pour l'animation pulse */}
+      <style jsx>{`
+        @keyframes pulse {
+          0% {
+            box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7);
+          }
+          70% {
+            box-shadow: 0 0 0 10px rgba(22, 163, 74, 0);
+          }
+          100% {
+            box-shadow: 0 0 0 0 rgba(22, 163, 74, 0);
+          }
+        }
+      `}</style>
 
       {/* Panneau d'information */}
       {selectedPark && (
@@ -299,12 +307,6 @@ const InteractiveMap: React.FC = () => {
             </div>
           </CardContent>
         </Card>
-      </div>
-
-      {/* Instructions d'utilisation */}
-      <div className="absolute bottom-4 right-4 bg-black/80 text-white px-3 py-2 rounded-lg text-xs max-w-xs">
-        <p className="mb-1">💡 Utilisez la molette pour zoomer</p>
-        <p>🖱️ Cliquez et glissez pour vous déplacer</p>
       </div>
     </div>
   );
