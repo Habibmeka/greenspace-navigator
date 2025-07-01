@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -248,7 +249,7 @@ const Biodiversity = () => {
                       {biodiversityStats.map((stat) => {
                         const Icon = stat.icon;
                         return (
-                          <div key={stat.id} className="flex flex-col items-center p-4 bg-greenspace-neutral/50 rounded-lg">
+                          <div key={`stat-${stat.id}`} className="flex flex-col items-center p-4 bg-greenspace-neutral/50 rounded-lg">
                             <Icon className="h-8 w-8 text-greenspace-primary mb-2" />
                             <span className="text-3xl font-bold">{stat.value}</span>
                             <span className="text-sm text-gray-600 text-center">{stat.label}</span>
