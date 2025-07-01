@@ -1,15 +1,16 @@
-
 import React, { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { TreeDeciduous, Info, Leaf, Map, Calendar } from 'lucide-react';
+import { TreeDeciduous, Info, Leaf, Map, Calendar, AlertTriangle, Recycle } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+import { useTreeRemovalData } from '@/hooks/useTreeRemovalData';
 
 const Biodiversity = () => {
   const [selectedTree, setSelectedTree] = useState<string | null>(null);
+  const { data: treeRemovalData, isLoading: isLoadingTreeRemoval } = useTreeRemovalData();
   
   // Données simulées pour la répartition des espèces
   const speciesData = [
@@ -95,7 +96,7 @@ const Biodiversity = () => {
           <TabsList className="mb-6">
             <TabsTrigger value="trees">Arbres remarquables</TabsTrigger>
             <TabsTrigger value="species">Répartition des essences</TabsTrigger>
-            <TabsTrigger value="projects">Projets de plantation</TabsTrigger>
+            <TabsTrigger value="projects">Projets écologiques</TabsTrigger>
           </TabsList>
           
           <TabsContent value="trees">
@@ -294,6 +295,97 @@ const Biodiversity = () => {
           </TabsContent>
           
           <TabsContent value="projects">
+            {/* Section des données d'abattage d'arbres */}
+            <div className="mb-8">
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="flex items-center">
+                        <AlertTriangle className="h-5 w-5 mr-2 text-orange-500" />
+                        Abattage et remplacement d'arbres
+                      </CardTitle>
+                      <CardDescription>
+                        Arbres abattus pour raisons sanitaires et leurs remplacements
+                      </CardDescription>
+                    </div>
+                    <Badge variant="outline" className="flex items-center">
+                      <Info className="mr-1 h-3 w-3" />
+                      Données en temps réel
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {isLoadingTreeRemoval ? (
+                    <div className="flex items-center justify-center py-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+                      <span className="ml-2 text-gray-600">Chargement des données...</span>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {treeRemovalData?.results?.slice(0, 3).map((record, index) => (
+                        <div key={record.record_id} className="border rounded-lg p-4 bg-orange-50">
+                          <div className="flex items-start justify-between mb-3">
+                            <div>
+                              <h4 className="font-medium text-gray-900">
+                                {record.fields?.essence_a_abattre || 'Essence non précisée'}
+                              </h4>
+                              <p className="text-sm text-gray-600">
+                                {record.fields?.adresse || 'Adresse non disponible'} - {record.fields?.arrondissement || 'N/A'}e arr.
+                              </p>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              {record.fields?.nombre_arbres_abattus && (
+                                <Badge variant="destructive" className="text-xs">
+                                  {record.fields.nombre_arbres_abattus} abattu{record.fields.nombre_arbres_abattus > 1 ? 's' : ''}
+                                </Badge>
+                              )}
+                              {record.fields?.nombre_arbres_replantes && (
+                                <Badge variant="default" className="text-xs bg-green-100 text-green-800">
+                                  {record.fields.nombre_arbres_replantes} replanté{record.fields.nombre_arbres_replantes > 1 ? 's' : ''}
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                            <div>
+                              <span className="text-gray-500">Motif:</span>
+                              <p className="font-medium">{record.fields?.motif_abattage || 'Non précisé'}</p>
+                            </div>
+                            <div>
+                              <span className="text-gray-500">Essence de remplacement:</span>
+                              <p className="font-medium flex items-center">
+                                <Recycle className="h-4 w-4 mr-1 text-green-600" />
+                                {record.fields?.essence_de_remplacement || 'Non précisée'}
+                              </p>
+                            </div>
+                            <div>
+                              <span className="text-gray-500">Date d'abattage:</span>
+                              <p className="font-medium">
+                                {record.fields?.date_abattage 
+                                  ? new Date(record.fields.date_abattage).toLocaleDateString('fr-FR')
+                                  : 'Non précisée'}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                      
+                      {treeRemovalData?.results && treeRemovalData.results.length > 3 && (
+                        <div className="text-center">
+                          <Button variant="outline" className="mt-4">
+                            Voir tous les {treeRemovalData.total_count} enregistrements
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+            
+            {/* Section des projets de plantation existants */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {plantingProjects.map((project, index) => (
                 <Card key={index} className="card-hover">
