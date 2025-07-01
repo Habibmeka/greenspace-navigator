@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -342,8 +341,8 @@ const Biodiversity = () => {
                     </div>
                   ) : (
                     <div className="space-y-4">
-                      {treeRemovalData?.results?.slice(0, 3).map((record) => (
-                        <div key={record.record_id} className="border rounded-lg p-4 bg-orange-50">
+                      {treeRemovalData?.results?.slice(0, 3).map((record, index) => (
+                        <div key={`tree-removal-${index}-${record.record_id}`} className="border rounded-lg p-4 bg-orange-50">
                           <div className="flex items-start justify-between mb-3">
                             <div>
                               <h4 className="font-medium text-gray-900">
