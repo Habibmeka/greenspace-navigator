@@ -82,6 +82,34 @@ const Biodiversity = () => {
     }
   ];
 
+  // Données des statistiques avec clés uniques
+  const biodiversityStats = [
+    {
+      id: 'trees',
+      icon: TreeDeciduous,
+      value: '200 000',
+      label: 'Arbres d\'alignement'
+    },
+    {
+      id: 'species',
+      icon: Leaf,
+      value: '150',
+      label: 'Espèces différentes'
+    },
+    {
+      id: 'greenspaces',
+      icon: Map,
+      value: '500',
+      label: 'Hectares d\'espaces verts'
+    },
+    {
+      id: 'plantations',
+      icon: Calendar,
+      value: '10 000',
+      label: 'Plantations par an'
+    }
+  ];
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -217,26 +245,16 @@ const Biodiversity = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-2 gap-4">
-                      <div className="flex flex-col items-center p-4 bg-greenspace-neutral/50 rounded-lg">
-                        <TreeDeciduous className="h-8 w-8 text-greenspace-primary mb-2" />
-                        <span className="text-3xl font-bold">200 000</span>
-                        <span className="text-sm text-gray-600 text-center">Arbres d'alignement</span>
-                      </div>
-                      <div className="flex flex-col items-center p-4 bg-greenspace-neutral/50 rounded-lg">
-                        <Leaf className="h-8 w-8 text-greenspace-primary mb-2" />
-                        <span className="text-3xl font-bold">150</span>
-                        <span className="text-sm text-gray-600 text-center">Espèces différentes</span>
-                      </div>
-                      <div className="flex flex-col items-center p-4 bg-greenspace-neutral/50 rounded-lg">
-                        <Map className="h-8 w-8 text-greenspace-primary mb-2" />
-                        <span className="text-3xl font-bold">500</span>
-                        <span className="text-sm text-gray-600 text-center">Hectares d'espaces verts</span>
-                      </div>
-                      <div className="flex flex-col items-center p-4 bg-greenspace-neutral/50 rounded-lg">
-                        <Calendar className="h-8 w-8 text-greenspace-primary mb-2" />
-                        <span className="text-3xl font-bold">10 000</span>
-                        <span className="text-sm text-gray-600 text-center">Plantations par an</span>
-                      </div>
+                      {biodiversityStats.map((stat) => {
+                        const Icon = stat.icon;
+                        return (
+                          <div key={stat.id} className="flex flex-col items-center p-4 bg-greenspace-neutral/50 rounded-lg">
+                            <Icon className="h-8 w-8 text-greenspace-primary mb-2" />
+                            <span className="text-3xl font-bold">{stat.value}</span>
+                            <span className="text-sm text-gray-600 text-center">{stat.label}</span>
+                          </div>
+                        );
+                      })}
                     </div>
                   </CardContent>
                 </Card>
