@@ -219,7 +219,7 @@ const Biodiversity = () => {
                           dataKey="value"
                         >
                           {speciesData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            <Cell key={`species-cell-${index}`} fill={COLORS[index % COLORS.length]} />
                           ))}
                         </Pie>
                         <Legend />
@@ -341,7 +341,7 @@ const Biodiversity = () => {
                     </div>
                   ) : (
                     <div className="space-y-4">
-                      {treeRemovalData?.results?.slice(0, 3).map((record, index) => (
+                      {treeRemovalData?.results?.slice(0, 3).map((record) => (
                         <div key={record.record_id} className="border rounded-lg p-4 bg-orange-50">
                           <div className="flex items-start justify-between mb-3">
                             <div>
@@ -406,7 +406,7 @@ const Biodiversity = () => {
             {/* Section des projets de plantation existants */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {plantingProjects.map((project, index) => (
-                <Card key={index} className="card-hover">
+                <Card key={`project-${index}`} className="card-hover">
                   <CardHeader className="pb-2">
                     <Badge className={`mb-2 ${
                       project.status === 'En cours' 
