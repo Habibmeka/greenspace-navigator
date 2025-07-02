@@ -6,7 +6,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import Navbar from '@/components/Navbar';
 import AirQualityCard from '@/components/AirQualityCard';
 import EcoTipsCard from '@/components/EcoTipsCard';
-import MapPreview from '@/components/MapPreview';
+import InteractiveMap from '@/components/InteractiveMap';
+
 const Index = () => {
   // Données simulées pour les écogestes
   const ecoTips = [{
@@ -63,13 +64,13 @@ const Index = () => {
         <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent"></div>
       </section>
 
-      {/* Map Preview Section */}
+      {/* Interactive Map Section */}
       <section className="py-12 bg-white">
         <div className="section-container">
           <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center">
             Trouvez votre espace vert idéal
           </h2>
-          <MapPreview />
+          <InteractiveMap />
         </div>
       </section>
 
@@ -213,4 +214,5 @@ const Index = () => {
       </footer>
     </div>;
 };
+
 export default Index;

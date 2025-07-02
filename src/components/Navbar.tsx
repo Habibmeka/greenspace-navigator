@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -9,7 +8,6 @@ const Navbar = () => {
   const location = useLocation();
 
   const navigation = [
-    { name: 'Accueil', href: '/', icon: <Leaf className="w-5 h-5 mr-1" /> },
     { name: 'Carte', href: '/map', icon: <MapPin className="w-5 h-5 mr-1" /> },
     { name: 'Qualité de l\'air', href: '/air-quality', icon: <Wind className="w-5 h-5 mr-1" /> },
     { name: 'Biodiversité', href: '/biodiversity', icon: <TreeDeciduous className="w-5 h-5 mr-1" /> },
