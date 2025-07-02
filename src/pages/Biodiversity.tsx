@@ -12,6 +12,9 @@ const Biodiversity = () => {
   const [selectedTree, setSelectedTree] = useState<string | null>(null);
   const { data: treeRemovalData, isLoading: isLoadingTreeRemoval } = useTreeRemovalData();
   
+  console.log('Biodiversity component rendering');
+  console.log('Tree removal data:', treeRemovalData);
+  
   // Données simulées pour la répartition des espèces
   const speciesData = [
     { name: 'Platane', value: 35 },
@@ -60,6 +63,7 @@ const Biodiversity = () => {
   // Projets de plantation
   const plantingProjects = [
     {
+      id: 'catalogne',
       title: 'Forêt urbaine Place de Catalogne',
       description: 'Création d\'une micro-forêt urbaine avec 500 arbres de différentes essences locales.',
       status: 'En cours',
@@ -67,6 +71,7 @@ const Biodiversity = () => {
       date: 'Été 2023'
     },
     {
+      id: 'boucicaut',
       title: 'Plantation participative Square Boucicaut',
       description: 'Plantation collective de 50 arbres fruitiers avec les habitants du quartier.',
       status: 'Planifié',
@@ -74,6 +79,7 @@ const Biodiversity = () => {
       date: 'Automne 2023'
     },
     {
+      id: 'ecoles',
       title: 'Végétalisation des cours d\'écoles',
       description: 'Transformation des cours d\'écoles en îlots de fraîcheur avec plantation d\'arbres.',
       status: 'En cours',
@@ -130,7 +136,7 @@ const Biodiversity = () => {
           <TabsContent value="trees">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {remarkableTrees.map((tree) => (
-                <Card key={tree.id} className="overflow-hidden card-hover">
+                <Card key={`remarkable-tree-${tree.id}`} className="overflow-hidden card-hover">
                   <div className="aspect-[4/3] relative">
                     <img 
                       src={tree.image} 
@@ -219,7 +225,7 @@ const Biodiversity = () => {
                           dataKey="value"
                         >
                           {speciesData.map((entry, index) => (
-                            <Cell key={`species-cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            <Cell key={`species-pie-cell-${index}-${entry.name}`} fill={COLORS[index % COLORS.length]} />
                           ))}
                         </Pie>
                         <Legend />
@@ -248,7 +254,7 @@ const Biodiversity = () => {
                       {biodiversityStats.map((stat) => {
                         const Icon = stat.icon;
                         return (
-                          <div key={`stat-${stat.id}`} className="flex flex-col items-center p-4 bg-greenspace-neutral/50 rounded-lg">
+                          <div key={`biodiversity-stat-${stat.id}`} className="flex flex-col items-center p-4 bg-greenspace-neutral/50 rounded-lg">
                             <Icon className="h-8 w-8 text-greenspace-primary mb-2" />
                             <span className="text-3xl font-bold">{stat.value}</span>
                             <span className="text-sm text-gray-600 text-center">{stat.label}</span>
@@ -342,14 +348,14 @@ const Biodiversity = () => {
                   ) : (
                     <div className="space-y-4">
                       {treeRemovalData?.results?.slice(0, 3).map((record, index) => (
-                        <div key={`tree-removal-${index}-${record.record_id}`} className="border rounded-lg p-4 bg-orange-50">
+                        <div key={`tree-removal-record-${index}-${record.record_id || record.idbase}`} className="border rounded-lg p-4 bg-orange-50">
                           <div className="flex items-start justify-between mb-3">
                             <div>
                               <h4 className="font-medium text-gray-900">
-                                {record.fields?.essence_a_abattre || 'Essence non précisée'}
+                                {record.fields?.essence_a_abattre || record.libellefrancais || 'Essence non précisée'}
                               </h4>
                               <p className="text-sm text-gray-600">
-                                {record.fields?.adresse || 'Adresse non disponible'} - {record.fields?.arrondissement || 'N/A'}e arr.
+                                {record.fields?.adresse || record.adresse || 'Adresse non disponible'} - {record.fields?.arrondissement || record.arrondissement || 'N/A'}
                               </p>
                             </div>
                             <div className="flex items-center space-x-2">
@@ -369,13 +375,13 @@ const Biodiversity = () => {
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                             <div>
                               <span className="text-gray-500">Motif:</span>
-                              <p className="font-medium">{record.fields?.motif_abattage || 'Non précisé'}</p>
+                              <p className="font-medium">{record.fields?.motif_abattage || record.motifabattage || 'Non précisé'}</p>
                             </div>
                             <div>
                               <span className="text-gray-500">Essence de remplacement:</span>
                               <p className="font-medium flex items-center">
                                 <Recycle className="h-4 w-4 mr-1 text-green-600" />
-                                {record.fields?.essence_de_remplacement || 'Non précisée'}
+                                {record.fields?.essence_de_remplacement || record.genrefutur || 'Non précisée'}
                               </p>
                             </div>
                             <div>
@@ -405,8 +411,8 @@ const Biodiversity = () => {
             
             {/* Section des projets de plantation existants */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {plantingProjects.map((project, index) => (
-                <Card key={`project-${index}`} className="card-hover">
+              {plantingProjects.map((project) => (
+                <Card key={`planting-project-${project.id}`} className="card-hover">
                   <CardHeader className="pb-2">
                     <Badge className={`mb-2 ${
                       project.status === 'En cours' 
