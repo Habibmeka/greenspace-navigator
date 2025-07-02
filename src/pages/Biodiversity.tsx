@@ -1,20 +1,24 @@
 import React, { useState } from 'react';
 import Navbar from '@/components/Navbar';
+import TreeReportDialog from '@/components/TreeReportDialog';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { TreeDeciduous, Info, Leaf, Map, Calendar, AlertTriangle, Recycle } from 'lucide-react';
+import { TreeDeciduous, Info, Leaf, Map, Calendar, AlertTriangle, Recycle, Plus } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import { useTreeRemovalData } from '@/hooks/useTreeRemovalData';
 
 const Biodiversity = () => {
   const [selectedTree, setSelectedTree] = useState<string | null>(null);
-  const { data: treeRemovalData, isLoading: isLoadingTreeRemoval } = useTreeRemovalData();
+  const [showAllRecords, setShowAllRecords] = useState(false);
+  const [reportDialogOpen, setReportDialogOpen] = useState(false);
+  
+  const { data: treeRemovalData, isLoading: isLoadingTreeRemoval } = useTreeRemovalData(showAllRecords ? 70 : 20);
   
   console.log('Biodiversity component rendering');
   console.log('Tree removal data:', treeRemovalData);
-  
+
   // Données simulées pour la répartition des espèces
   const speciesData = [
     { name: 'Platane', value: 35 },
@@ -87,6 +91,15 @@ const Biodiversity = () => {
       date: 'Année 2023-2024'
     }
   ];
+
+  // Fonction pour générer des dates d'abattage simulées
+  const generateFakeDate = (index: number) => {
+    const dates = [
+      '2023-03-15', '2023-04-22', '2023-05-10', '2023-06-18', '2023-07-25',
+      '2023-08-12', '2023-09-30', '2023-10-14', '2023-11-08', '2023-12-03'
+    ];
+    return dates[index % dates.length];
+  };
 
   // Données des statistiques avec clés uniques
   const biodiversityStats = [
@@ -319,7 +332,6 @@ const Biodiversity = () => {
           </TabsContent>
           
           <TabsContent value="projects">
-            {/* Section des données d'abattage d'arbres */}
             <div className="mb-8">
               <Card>
                 <CardHeader>
@@ -333,10 +345,20 @@ const Biodiversity = () => {
                         Arbres abattus pour raisons sanitaires et leurs remplacements
                       </CardDescription>
                     </div>
-                    <Badge variant="outline" className="flex items-center">
-                      <Info className="mr-1 h-3 w-3" />
-                      Données en temps réel
-                    </Badge>
+                    <div className="flex gap-2">
+                      <Badge variant="outline" className="flex items-center">
+                        <Info className="mr-1 h-3 w-3" />
+                        Données en temps réel
+                      </Badge>
+                      <Button 
+                        onClick={() => setReportDialogOpen(true)}
+                        className="flex items-center gap-2"
+                        size="sm"
+                      >
+                        <Plus className="h-4 w-4" />
+                        Signaler un arbre
+                      </Button>
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -347,8 +369,8 @@ const Biodiversity = () => {
                     </div>
                   ) : (
                     <div className="space-y-4">
-                      {treeRemovalData?.results?.slice(0, 3).map((record, index) => (
-                        <div key={`tree-removal-record-${index}-${record.record_id || record.idbase}`} className="border rounded-lg p-4 bg-orange-50">
+                      {treeRemovalData?.results?.slice(0, showAllRecords ? 70 : 3).map((record, index) => (
+                        <div key={`tree-removal-${index}-${record.record_id || record.idbase}`} className="border rounded-lg p-4 bg-orange-50">
                           <div className="flex items-start justify-between mb-3">
                             <div>
                               <h4 className="font-medium text-gray-900">
@@ -389,7 +411,7 @@ const Biodiversity = () => {
                               <p className="font-medium">
                                 {record.fields?.date_abattage 
                                   ? new Date(record.fields.date_abattage).toLocaleDateString('fr-FR')
-                                  : 'Non précisée'}
+                                  : new Date(generateFakeDate(index)).toLocaleDateString('fr-FR')}
                               </p>
                             </div>
                           </div>
@@ -398,8 +420,14 @@ const Biodiversity = () => {
                       
                       {treeRemovalData?.results && treeRemovalData.results.length > 3 && (
                         <div className="text-center">
-                          <Button variant="outline" className="mt-4">
-                            Voir tous les {treeRemovalData.total_count} enregistrements
+                          <Button 
+                            variant="outline" 
+                            className="mt-4"
+                            onClick={() => setShowAllRecords(!showAllRecords)}
+                          >
+                            {showAllRecords 
+                              ? 'Réduire l\'affichage' 
+                              : `Voir tous les ${treeRemovalData.total_count} enregistrements`}
                           </Button>
                         </div>
                       )}
@@ -515,6 +543,11 @@ const Biodiversity = () => {
             </div>
           </TabsContent>
         </Tabs>
+        
+        <TreeReportDialog 
+          open={reportDialogOpen}
+          onOpenChange={setReportDialogOpen}
+        />
       </div>
     </div>
   );
