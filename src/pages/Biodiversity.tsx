@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import TreeReportDialog from '@/components/TreeReportDialog';
@@ -6,19 +5,23 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { TreeDeciduous, Info, Leaf, Map, Calendar, AlertTriangle, Recycle, Plus } from 'lucide-react';
+import { TreeDeciduous, Info, Leaf, Map, Calendar, AlertTriangle, Recycle, Plus, MapPin } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import { useTreeRemovalData } from '@/hooks/useTreeRemovalData';
+import { useRemarkableTreesData } from '@/hooks/useRemarkableTreesData';
 
 const Biodiversity = () => {
   const [selectedTree, setSelectedTree] = useState<string | null>(null);
   const [showAllRecords, setShowAllRecords] = useState(false);
+  const [showAllRemarkableTrees, setShowAllRemarkableTrees] = useState(false);
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
   
   const { data: treeRemovalData, isLoading: isLoadingTreeRemoval } = useTreeRemovalData(showAllRecords ? 70 : 20);
+  const { data: remarkableTreesData, isLoading: isLoadingRemarkableTrees } = useRemarkableTreesData(showAllRemarkableTrees ? 50 : 6);
   
   console.log('Biodiversity component rendering');
   console.log('Tree removal data:', treeRemovalData);
+  console.log('Remarkable trees data:', remarkableTreesData);
 
   // Données simulées pour la répartition des espèces
   const speciesData = [
@@ -30,40 +33,6 @@ const Biodiversity = () => {
   ];
   
   const COLORS = ['#66BB6A', '#43A047', '#2E7D32', '#1B5E20', '#81C784'];
-  
-  // Données simulées des arbres remarquables
-  const remarkableTrees = [
-    {
-      id: 1,
-      name: 'Platane du Luxembourg',
-      species: 'Platanus x hispanica',
-      age: '~150 ans',
-      height: '25 mètres',
-      location: 'Jardin du Luxembourg',
-      description: 'Ce platane majestueux est l\'un des plus anciens du Jardin du Luxembourg. Ses branches imposantes offrent une ombre généreuse aux visiteurs.',
-      image: 'https://images.unsplash.com/photo-1472396961693-142e6e269027?auto=format&fit=crop&w=800&q=80'
-    },
-    {
-      id: 2,
-      name: 'Cèdre du Liban',
-      species: 'Cedrus libani',
-      age: '~200 ans',
-      height: '30 mètres',
-      location: 'Jardin des Plantes',
-      description: 'Planté au début du 19ème siècle, ce cèdre du Liban est remarquable par sa silhouette étalée caractéristique et sa longévité exceptionnelle.',
-      image: 'https://images.unsplash.com/photo-1518495973542-4542c06a5843?auto=format&fit=crop&w=800&q=80'
-    },
-    {
-      id: 3,
-      name: 'Ginkgo biloba du Petit Palais',
-      species: 'Ginkgo biloba',
-      age: '~120 ans',
-      height: '22 mètres',
-      location: 'Jardin du Petit Palais',
-      description: 'Le Ginkgo est une espèce "fossile vivante" qui existe depuis plus de 270 millions d\'années. Cet exemplaire présente un magnifique feuillage doré à l\'automne.',
-      image: 'https://images.unsplash.com/photo-1615729947596-a598e5de0ab3?auto=format&fit=crop&w=800&q=80'
-    }
-  ];
   
   // Projets de plantation
   const plantingProjects = [
@@ -151,65 +120,94 @@ const Biodiversity = () => {
           </TabsList>
           
           <TabsContent value="trees">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {remarkableTrees.map((tree) => (
-                <Card key={`remarkable-tree-${tree.id}`} className="overflow-hidden card-hover">
-                  <div className="aspect-[4/3] relative">
-                    <img 
-                      src={tree.image} 
-                      alt={tree.name}
-                      className="object-cover w-full h-full"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent flex flex-col justify-end p-4">
-                      <h3 className="text-white text-xl font-bold">{tree.name}</h3>
-                      <p className="text-white/90 text-sm">{tree.species}</p>
-                    </div>
-                  </div>
-                  <CardContent className="p-4">
-                    <div className="grid grid-cols-2 gap-4 mb-4">
-                      <div>
-                        <p className="text-xs text-gray-500">Âge</p>
-                        <p className="font-medium">{tree.age}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-gray-500">Hauteur</p>
-                        <p className="font-medium">{tree.height}</p>
-                      </div>
-                      <div className="col-span-2">
-                        <p className="text-xs text-gray-500">Localisation</p>
-                        <p className="font-medium">{tree.location}</p>
+            {isLoadingRemarkableTrees ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+                <span className="ml-2 text-gray-600">Chargement des arbres remarquables...</span>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {remarkableTreesData?.results?.map((tree, index) => (
+                  <Card key={`remarkable-tree-${tree.idbase || index}`} className="overflow-hidden card-hover">
+                    <div className="aspect-[4/3] relative bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
+                      <TreeDeciduous className="h-24 w-24 text-white/80" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent flex flex-col justify-end p-4">
+                        <h3 className="text-white text-xl font-bold">
+                          {tree.libellefrancais || tree.genre || 'Arbre remarquable'}
+                        </h3>
+                        <p className="text-white/90 text-sm">
+                          {tree.genre} {tree.espece && `- ${tree.espece}`}
+                        </p>
                       </div>
                     </div>
-                    <p className="text-sm text-gray-600">
-                      {tree.description.length > 120 
-                        ? tree.description.substring(0, 120) + '...' 
-                        : tree.description}
-                    </p>
-                  </CardContent>
-                  <CardFooter className="pt-0">
-                    <Button 
-                      variant="outline" 
-                      className="w-full"
-                      onClick={() => setSelectedTree(tree.name)}
-                    >
-                      En savoir plus
-                    </Button>
-                  </CardFooter>
+                    <CardContent className="p-4">
+                      <div className="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                          <p className="text-xs text-gray-500">Circonférence</p>
+                          <p className="font-medium">
+                            {tree.circonferenceencm ? `${tree.circonferenceencm} cm` : 'Non renseignée'}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-500">Hauteur</p>
+                          <p className="font-medium">
+                            {tree.hauteurenm ? `${tree.hauteurenm} m` : 'Non renseignée'}
+                          </p>
+                        </div>
+                        <div className="col-span-2">
+                          <p className="text-xs text-gray-500">Localisation</p>
+                          <p className="font-medium flex items-center">
+                            <MapPin className="h-3 w-3 mr-1 text-green-600" />
+                            {tree.adresse || 'Adresse non disponible'}
+                          </p>
+                          {tree.arrondissement && (
+                            <p className="text-xs text-gray-500 mt-1">{tree.arrondissement}</p>
+                          )}
+                        </div>
+                      </div>
+                      {tree.stadedeveloppement && (
+                        <div className="mb-3">
+                          <Badge variant="outline" className="text-xs">
+                            {tree.stadedeveloppement}
+                          </Badge>
+                        </div>
+                      )}
+                      {tree.dateplantation && (
+                        <p className="text-sm text-gray-600">
+                          <strong>Planté en:</strong> {new Date(tree.dateplantation).getFullYear()}
+                        </p>
+                      )}
+                    </CardContent>
+                    <CardFooter className="pt-0">
+                      <Button 
+                        variant="outline" 
+                        className="w-full"
+                        onClick={() => setSelectedTree(tree.idbase || '')}
+                      >
+                        En savoir plus
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                ))}
+                
+                <Card className="flex flex-col items-center justify-center p-6 border-dashed border-2 border-gray-300 card-hover">
+                  <TreeDeciduous className="h-12 w-12 text-gray-400 mb-4" />
+                  <h3 className="text-lg font-medium text-gray-600 mb-2">Découvrir plus</h3>
+                  <p className="text-sm text-gray-500 text-center mb-4">
+                    {remarkableTreesData?.total_count 
+                      ? `Il y a ${remarkableTreesData.total_count} arbres remarquables répertoriés à Paris.`
+                      : 'Découvrez tous les arbres remarquables de Paris.'
+                    }
+                  </p>
+                  <Button 
+                    variant="outline"
+                    onClick={() => setShowAllRemarkableTrees(!showAllRemarkableTrees)}
+                  >
+                    {showAllRemarkableTrees ? 'Voir moins' : 'Voir tous les arbres'}
+                  </Button>
                 </Card>
-              ))}
-              
-              {/* Afficher plus de cartes */}
-              <Card className="flex flex-col items-center justify-center p-6 border-dashed border-2 border-gray-300 card-hover">
-                <TreeDeciduous className="h-12 w-12 text-gray-400 mb-4" />
-                <h3 className="text-lg font-medium text-gray-600 mb-2">Découvrir plus</h3>
-                <p className="text-sm text-gray-500 text-center mb-4">
-                  Il y a plus de 200 arbres remarquables répertoriés à Paris.
-                </p>
-                <Button variant="outline">
-                  Voir tous les arbres
-                </Button>
-              </Card>
-            </div>
+              </div>
+            )}
           </TabsContent>
           
           <TabsContent value="species">
@@ -448,7 +446,6 @@ const Biodiversity = () => {
               </Card>
             </div>
             
-            {/* Section des projets de plantation existants */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {plantingProjects.map((project) => (
                 <Card key={`planting-project-${project.id}`} className="card-hover">
