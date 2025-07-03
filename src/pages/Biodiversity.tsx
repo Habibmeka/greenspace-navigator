@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import TreeReportDialog from '@/components/TreeReportDialog';
@@ -128,15 +129,15 @@ const Biodiversity = () => {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {remarkableTreesData?.results?.map((tree, index) => (
-                  <Card key={`remarkable-tree-${tree.idbase || index}`} className="overflow-hidden card-hover">
+                  <Card key={`remarkable-tree-${tree.arbres_idbase || index}`} className="overflow-hidden card-hover">
                     <div className="aspect-[4/3] relative bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
                       <TreeDeciduous className="h-24 w-24 text-white/80" />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent flex flex-col justify-end p-4">
                         <h3 className="text-white text-xl font-bold">
-                          {tree.libellefrancais || tree.genre || 'Arbre remarquable'}
+                          {tree.arbres_libellefrancais || tree.com_nom_usuel || 'Arbre remarquable'}
                         </h3>
                         <p className="text-white/90 text-sm">
-                          {tree.genre} {tree.espece && `- ${tree.espece}`}
+                          {tree.arbres_genre} {tree.arbres_espece && `${tree.arbres_espece}`}
                         </p>
                       </div>
                     </div>
@@ -145,36 +146,41 @@ const Biodiversity = () => {
                         <div>
                           <p className="text-xs text-gray-500">Circonférence</p>
                           <p className="font-medium">
-                            {tree.circonferenceencm ? `${tree.circonferenceencm} cm` : 'Non renseignée'}
+                            {tree.arbres_circonferenceencm ? `${tree.arbres_circonferenceencm} cm` : 'Non renseignée'}
                           </p>
                         </div>
                         <div>
                           <p className="text-xs text-gray-500">Hauteur</p>
                           <p className="font-medium">
-                            {tree.hauteurenm ? `${tree.hauteurenm} m` : 'Non renseignée'}
+                            {tree.arbres_hauteurenm ? `${tree.arbres_hauteurenm} m` : 'Non renseignée'}
                           </p>
                         </div>
                         <div className="col-span-2">
                           <p className="text-xs text-gray-500">Localisation</p>
                           <p className="font-medium flex items-center">
                             <MapPin className="h-3 w-3 mr-1 text-green-600" />
-                            {tree.adresse || 'Adresse non disponible'}
+                            {tree.arbres_adresse || tree.com_adresse || 'Adresse non disponible'}
                           </p>
-                          {tree.arrondissement && (
-                            <p className="text-xs text-gray-500 mt-1">{tree.arrondissement}</p>
+                          {tree.arbres_arrondissement && (
+                            <p className="text-xs text-gray-500 mt-1">{tree.arbres_arrondissement}</p>
                           )}
                         </div>
                       </div>
-                      {tree.stadedeveloppement && (
+                      {tree.arbres_stadedeveloppement && (
                         <div className="mb-3">
                           <Badge variant="outline" className="text-xs">
-                            {tree.stadedeveloppement}
+                            Stade: {tree.arbres_stadedeveloppement}
                           </Badge>
                         </div>
                       )}
-                      {tree.dateplantation && (
+                      {tree.arbres_dateplantation && tree.arbres_dateplantation !== '1700-01-01T00:09:21+00:00' && (
                         <p className="text-sm text-gray-600">
-                          <strong>Planté en:</strong> {new Date(tree.dateplantation).getFullYear()}
+                          <strong>Planté en:</strong> {new Date(tree.arbres_dateplantation).getFullYear()}
+                        </p>
+                      )}
+                      {tree.com_annee_plantation && tree.com_annee_plantation !== 'Inconnue' && (
+                        <p className="text-sm text-gray-600">
+                          <strong>Année de plantation:</strong> {tree.com_annee_plantation}
                         </p>
                       )}
                     </CardContent>
@@ -182,7 +188,7 @@ const Biodiversity = () => {
                       <Button 
                         variant="outline" 
                         className="w-full"
-                        onClick={() => setSelectedTree(tree.idbase || '')}
+                        onClick={() => setSelectedTree(tree.arbres_idbase?.toString() || '')}
                       >
                         En savoir plus
                       </Button>
