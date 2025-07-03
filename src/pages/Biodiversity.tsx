@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import TreeReportDialog from '@/components/TreeReportDialog';
@@ -10,8 +9,10 @@ import { TreeDeciduous, Info, Leaf, Map, Calendar, AlertTriangle, Recycle, Plus,
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import { useTreeRemovalData } from '@/hooks/useTreeRemovalData';
 import { useRemarkableTreesData } from '@/hooks/useRemarkableTreesData';
+import { useNavigate } from 'react-router-dom';
 
 const Biodiversity = () => {
+  const navigate = useNavigate();
   const [selectedTree, setSelectedTree] = useState<string | null>(null);
   const [showAllRecords, setShowAllRecords] = useState(false);
   const [showAllRemarkableTrees, setShowAllRemarkableTrees] = useState(false);
@@ -23,6 +24,32 @@ const Biodiversity = () => {
   console.log('Biodiversity component rendering');
   console.log('Tree removal data:', treeRemovalData);
   console.log('Remarkable trees data:', remarkableTreesData);
+
+  // Fonction pour obtenir une image d'arbre basée sur le genre
+  const getTreeImage = (genre?: string) => {
+    const treeImages = {
+      'Platanus': 'photo-1509316975850-ff9c5deb0cd9', // platane
+      'Tilia': 'photo-1513836279014-a89f7a76ae86', // tilleul
+      'Aesculus': 'photo-1518495973542-4542c06a5843', // marronnier
+      'Quercus': 'photo-1472396961693-142e6e269027', // chêne
+      'Corylus': 'photo-1509316975850-ff9c5deb0cd9', // noisetier
+      'Liriodendron': 'photo-1513836279014-a89f7a76ae86', // tulipier
+      'Celtis': 'photo-1518495973542-4542c06a5843', // micocoulier
+      'default': 'photo-1509316975850-ff9c5deb0cd9'
+    };
+    
+    const imageKey = genre && treeImages[genre as keyof typeof treeImages] 
+      ? treeImages[genre as keyof typeof treeImages] 
+      : treeImages.default;
+    
+    return `https://images.unsplash.com/${imageKey}?auto=format&fit=crop&w=400&h=300&q=80`;
+  };
+
+  // Fonction pour naviguer vers la page de détails
+  const handleTreeDetails = (tree: any) => {
+    const treeId = tree.idbase || tree.record_id || Math.random().toString();
+    navigate(`/tree-details/${treeId}`, { state: { tree } });
+  };
 
   // Données simulées pour la répartition des espèces
   const speciesData = [
@@ -129,15 +156,19 @@ const Biodiversity = () => {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {remarkableTreesData?.results?.map((tree, index) => (
-                  <Card key={`remarkable-tree-${tree.arbres_idbase || index}`} className="overflow-hidden card-hover">
-                    <div className="aspect-[4/3] relative bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
-                      <TreeDeciduous className="h-24 w-24 text-white/80" />
+                  <Card key={`remarkable-tree-${tree.idbase || index}`} className="overflow-hidden card-hover">
+                    <div className="aspect-[4/3] relative">
+                      <img 
+                        src={getTreeImage(tree.genre)} 
+                        alt={tree.libellefrancais || 'Arbre remarquable'}
+                        className="w-full h-full object-cover"
+                      />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent flex flex-col justify-end p-4">
                         <h3 className="text-white text-xl font-bold">
-                          {tree.arbres_libellefrancais || tree.com_nom_usuel || 'Arbre remarquable'}
+                          {tree.libellefrancais || 'Arbre remarquable'}
                         </h3>
                         <p className="text-white/90 text-sm">
-                          {tree.arbres_genre} {tree.arbres_espece && `${tree.arbres_espece}`}
+                          {tree.genre} {tree.espece && `${tree.espece}`}
                         </p>
                       </div>
                     </div>
@@ -146,41 +177,36 @@ const Biodiversity = () => {
                         <div>
                           <p className="text-xs text-gray-500">Circonférence</p>
                           <p className="font-medium">
-                            {tree.arbres_circonferenceencm ? `${tree.arbres_circonferenceencm} cm` : 'Non renseignée'}
+                            {tree.circonferenceencm ? `${tree.circonferenceencm} cm` : 'Non renseignée'}
                           </p>
                         </div>
                         <div>
                           <p className="text-xs text-gray-500">Hauteur</p>
                           <p className="font-medium">
-                            {tree.arbres_hauteurenm ? `${tree.arbres_hauteurenm} m` : 'Non renseignée'}
+                            {tree.hauteurenm ? `${tree.hauteurenm} m` : 'Non renseignée'}
                           </p>
                         </div>
                         <div className="col-span-2">
                           <p className="text-xs text-gray-500">Localisation</p>
                           <p className="font-medium flex items-center">
                             <MapPin className="h-3 w-3 mr-1 text-green-600" />
-                            {tree.arbres_adresse || tree.com_adresse || 'Adresse non disponible'}
+                            {tree.adresse || 'Adresse non disponible'}
                           </p>
-                          {tree.arbres_arrondissement && (
-                            <p className="text-xs text-gray-500 mt-1">{tree.arbres_arrondissement}</p>
+                          {tree.arrondissement && (
+                            <p className="text-xs text-gray-500 mt-1">{tree.arrondissement}</p>
                           )}
                         </div>
                       </div>
-                      {tree.arbres_stadedeveloppement && (
+                      {tree.stadedeveloppement && (
                         <div className="mb-3">
                           <Badge variant="outline" className="text-xs">
-                            Stade: {tree.arbres_stadedeveloppement}
+                            Stade: {tree.stadedeveloppement}
                           </Badge>
                         </div>
                       )}
-                      {tree.arbres_dateplantation && tree.arbres_dateplantation !== '1700-01-01T00:09:21+00:00' && (
+                      {tree.dateplantation && tree.dateplantation !== '1700-01-01T00:09:21+00:00' && (
                         <p className="text-sm text-gray-600">
-                          <strong>Planté en:</strong> {new Date(tree.arbres_dateplantation).getFullYear()}
-                        </p>
-                      )}
-                      {tree.com_annee_plantation && tree.com_annee_plantation !== 'Inconnue' && (
-                        <p className="text-sm text-gray-600">
-                          <strong>Année de plantation:</strong> {tree.com_annee_plantation}
+                          <strong>Planté en:</strong> {new Date(tree.dateplantation).getFullYear()}
                         </p>
                       )}
                     </CardContent>
@@ -188,7 +214,7 @@ const Biodiversity = () => {
                       <Button 
                         variant="outline" 
                         className="w-full"
-                        onClick={() => setSelectedTree(tree.arbres_idbase?.toString() || '')}
+                        onClick={() => handleTreeDetails(tree)}
                       >
                         En savoir plus
                       </Button>

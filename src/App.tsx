@@ -8,9 +8,10 @@ import Index from "./pages/Index";
 import Map from "./pages/Map";
 import AirQuality from "./pages/AirQuality";
 import Biodiversity from "./pages/Biodiversity";
+import TreeDetails from "./pages/TreeDetails";
 import EcoTips from "./pages/EcoTips";
-import SignUp from "./pages/SignUp";
 import SignIn from "./pages/SignIn";
+import SignUp from "./pages/SignUp";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,10 +27,10 @@ const App = () => (
           <Route path="/map" element={<Map />} />
           <Route path="/air-quality" element={<AirQuality />} />
           <Route path="/biodiversity" element={<Biodiversity />} />
+          <Route path="/tree-details/:treeId" element={<TreeDetails />} />
           <Route path="/eco-tips" element={<EcoTips />} />
-          <Route path="/sign-up" element={<SignUp />} />
           <Route path="/sign-in" element={<SignIn />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="/sign-up" element={<SignUp />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
