@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import TreeReportDialog from '@/components/TreeReportDialog';
@@ -375,13 +376,20 @@ const Biodiversity = () => {
                       {treeRemovalData?.results?.slice(0, showAllRecords ? 70 : 3).map((record, index) => (
                         <div key={`tree-removal-${index}-${record.record_id || record.idbase}`} className="border rounded-lg p-4 bg-orange-50">
                           <div className="flex items-start justify-between mb-3">
-                            <div>
-                              <h4 className="font-medium text-gray-900">
-                                {record.fields?.essence_a_abattre || record.libellefrancais || 'Essence non précisée'}
-                              </h4>
-                              <p className="text-sm text-gray-600">
-                                {record.fields?.adresse || record.adresse || 'Adresse non disponible'} - {record.fields?.arrondissement || record.arrondissement || 'N/A'}
-                              </p>
+                            <div className="flex items-start gap-4">
+                              <img 
+                                src="/lovable-uploads/58ee51ec-bad1-4a84-9417-f35c5c54bf87.png" 
+                                alt="Arbre abattu"
+                                className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
+                              />
+                              <div>
+                                <h4 className="font-medium text-gray-900">
+                                  {record.fields?.essence_a_abattre || record.libellefrancais || 'Essence non précisée'}
+                                </h4>
+                                <p className="text-sm text-gray-600">
+                                  {record.fields?.adresse || record.adresse || 'Adresse non disponible'} - {record.fields?.arrondissement || record.arrondissement || 'N/A'}
+                                </p>
+                              </div>
                             </div>
                             <div className="flex items-center space-x-2">
                               {record.fields?.nombre_arbres_abattus && (
