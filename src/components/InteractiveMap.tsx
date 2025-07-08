@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -25,7 +24,7 @@ interface GreenSpaceRecord {
 }
 
 const InteractiveMap: React.FC = () => {
-  const { data, isLoading, error } = useParisGreenSpaces();
+  const { data, isLoading, error } = useParisGreenSpaces(100);
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [selectedPark, setSelectedPark] = useState<GreenSpaceRecord | null>(null);
