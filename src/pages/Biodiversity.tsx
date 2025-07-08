@@ -1,3 +1,4 @@
+
 import React from 'react';
 import Navbar from '@/components/Navbar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -206,7 +207,7 @@ const Biodiversity = () => {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {treeRemovalData?.results?.slice(0, 12).map((removal) => (
-                  <Card key={removal.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                  <Card key={removal.record_id || removal.idbase} className="overflow-hidden hover:shadow-lg transition-shadow">
                     <CardContent className="p-4">
                       <h3 className="font-semibold text-lg mb-2 text-red-700">
                         {removal.libellefrancais || 'Arbre abattu'}
@@ -223,17 +224,17 @@ const Biodiversity = () => {
                           </div>
                         )}
                         
-                        {removal.dateAbattage && (
+                        {removal.fields?.date_abattage && (
                           <div className="flex items-center">
                             <Calendar className="h-4 w-4 mr-2 text-red-600" />
-                            <span>Abattu le: {formatDate(removal.dateAbattage)}</span>
+                            <span>Abattu le: {formatDate(removal.fields.date_abattage)}</span>
                           </div>
                         )}
                         
-                        {removal.cause && (
+                        {removal.motifabattage && (
                           <div className="flex items-start">
                             <Info className="h-4 w-4 mr-2 text-red-600" />
-                            <span>Cause: {removal.cause}</span>
+                            <span>Cause: {removal.motifabattage}</span>
                           </div>
                         )}
                       </div>
