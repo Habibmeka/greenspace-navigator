@@ -49,6 +49,9 @@ const InteractiveMap: React.FC = () => {
       zoom: 11
     });
 
+    // Désactiver le zoom par scroll pour éviter les conflits avec le scroll de la page
+    map.current.scrollZoom.disable();
+
     // Ajouter les contrôles de navigation
     map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
