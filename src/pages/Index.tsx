@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -7,6 +8,7 @@ import Navbar from '@/components/Navbar';
 import AirQualityCard from '@/components/AirQualityCard';
 import EcoTipsCard from '@/components/EcoTipsCard';
 import InteractiveMap from '@/components/InteractiveMap';
+import HeroCarousel from '@/components/HeroCarousel';
 
 const Index = () => {
   // Données simulées pour les écogestes
@@ -26,43 +28,12 @@ const Index = () => {
     icon: <TreeDeciduous className="h-6 w-6" />,
     moreLink: "/eco-tips#plants"
   }];
+
   return <div className="min-h-screen flex flex-col">
       <Navbar />
       
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-r from-greenspace-primary to-greenspace-light text-white py-16">
-        <div className="section-container">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-            <div>
-              <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-                Explorez Paris, <br />Naturellement
-              </h1>
-              <p className="text-lg text-white/90 mb-6">
-                Découvrez les espaces verts parisiens, suivez la qualité de l'air
-                et adoptez des gestes écologiques pour une ville plus durable.
-              </p>
-              <div className="flex flex-wrap gap-4">
-                <Link to="/map">
-                  <Button size="lg" className="bg-white text-greenspace-primary hover:bg-white/90">
-                    <MapPin className="mr-2 h-5 w-5" />
-                    Explorer la carte
-                  </Button>
-                </Link>
-                <Link to="/biodiversity">
-                  <Button size="lg" variant="outline" className="border-white hover:bg-white/20 text-gray-900">
-                    <TreeDeciduous className="mr-2 h-5 w-5" />
-                    Découvrir la biodiversité
-                  </Button>
-                </Link>
-              </div>
-            </div>
-            <div className="hidden lg:block">
-              <img src="https://images.unsplash.com/photo-1518495973542-4542c06a5843?auto=format&fit=crop&w=800&h=600&q=80" alt="Parc à Paris" className="rounded-lg shadow-lg max-w-full" />
-            </div>
-          </div>
-        </div>
-        <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent"></div>
-      </section>
+      {/* Hero Section with Carousel */}
+      <HeroCarousel />
 
       {/* Interactive Map Section */}
       <section className="py-12 bg-white">
